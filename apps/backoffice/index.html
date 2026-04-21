@@ -797,9 +797,9 @@ tbody tr.selected { background: var(--color-row-selected); border-left: 3px soli
 const promotions = [
   {id:"PRM-20260408-0001",name:"100% First Deposit Bonus",type:"Deposit Bonus",period:"2026-04-08 ~ Long-term",cost:"₱125,000",claims:"250 / 180",status:"Enabled",by:"admin_john",remark:"Q2 campaign",updated:"2026-04-16 18:00:00"},
   {id:"PRM-20260408-0002",name:"50% Reload Bonus",type:"Deposit Bonus",period:"2026-04-08 ~ 2026-05-08",cost:"₱42,000",claims:"84 / 60",status:"Enabled",by:"admin_sarah",remark:"Monthly promo",updated:"2026-04-15 10:30:00"},
-  {id:"PRM-20260408-0003",name:"Weekend Special",type:"Deposit Bonus",period:"2026-04-12 ~ 2026-04-14",cost:"₱8,500",claims:"17 / 15",status:"Disabled",by:"admin_john",remark:"Ended early",updated:"2026-04-14 23:00:00"},
+  {id:"PRM-20260408-0003",name:"Weekend Special",type:"Deposit Bonus",period:"2026-04-12 ~ 2026-04-14",cost:"₱8,500",claims:"17 / 15",status:"Disabled",by:"admin_john",remark:"Ended early",updated:"2026-04-14 23:00:00",_missing:[]},
   {id:"PRM-20260408-0004",name:"VIP Exclusive 80%",type:"Deposit Bonus",period:"2026-04-10 ~ Long-term",cost:"₱320,000",claims:"400 / 95",status:"Enabled",by:"admin_sarah",remark:"VIP only",updated:"2026-04-16 09:15:00"},
-  {id:"PRM-20260408-0005",name:"New Player Welcome",type:"Deposit Bonus",period:"2026-04-01 ~ Long-term",cost:"₱67,000",claims:"134 / 134",status:"Disabled",by:"admin_john",remark:"Replaced by 0001",updated:"2026-04-08 12:00:00"},
+  {id:"PRM-20260408-0005",name:"New Player Welcome",type:"Deposit Bonus",period:"2026-04-01 ~ Long-term",cost:"₱67,000",claims:"134 / 134",status:"Disabled",by:"admin_john",remark:"Draft — not yet configured",updated:"2026-04-08 12:00:00",_missing:[{step:3,label:"Bonus Turnover Multiplier"},{step:4,label:"Card Icon"},{step:4,label:"Main Title"}]},
 ];
 
 const rewards = [
@@ -890,7 +890,18 @@ function togglePromoStatus(idx) {
     if (err) err.classList.add('hidden');
     openModal('deactivate-modal');
   } else {
-    // Disabled → Enabled : direct toggle, no confirmation
+    // Disabled → Enabled : PRD §操作規則 line 77 — must have all required fields complete across 4 steps.
+    // No confirmation modal; block + toast + jump to first missing step in Edit mode.
+    const missing = Array.isArray(p._missing) ? p._missing : [];
+    if (missing.length > 0) {
+      const list = missing.map(m => `• Step ${m.step} · ${m.label}`).join('<br>');
+      showToast('error', 'Cannot Enable — Incomplete Setup',
+        'Complete these required fields first:<br>' + list);
+      const firstStep = Math.min.apply(null, missing.map(m => m.step));
+      renderPromoTable(); // re-sync toggle visual before navigating
+      setTimeout(() => goToWizard(firstStep, 'edit'), 500);
+      return;
+    }
     p.status = 'Enabled';
   }
   // Always re-render so the toggle visual never drifts from the data
