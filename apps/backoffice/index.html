@@ -242,6 +242,8 @@ input, select, textarea { font-family: inherit; font-size: var(--font-base); }
 .form-input:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 .form-input::placeholder { color: var(--color-text-muted); }
 .form-input-disabled { background: #f9fafb; color: var(--color-text-muted); cursor: not-allowed; }
+.input-error { border-color: var(--color-danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
+.form-error { font-size: var(--font-xs); color: var(--color-danger); margin-top: var(--sp-xs); }
 .form-row { display: grid; gap: var(--sp-lg); }
 .form-row-2 { grid-template-columns: 1fr 1fr; }
 .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -557,13 +559,8 @@ tbody tr.selected { background: var(--color-row-selected); border-left: 3px soli
   <aside class="sidebar">
     <div class="sidebar-logo">☰ iGaming Backoffice</div>
     <nav class="sidebar-nav">
-      <a class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-      <a class="nav-item" data-page="transactions"><span class="nav-icon">💳</span> Transactions</a>
-      <a class="nav-item" data-page="players"><span class="nav-icon">👥</span> Players</a>
-      <a class="nav-item active" data-page="promo-list"><span class="nav-icon">🎯</span> Promotions</a>
+      <a class="nav-item active" data-page="promo-list"><span class="nav-icon">🎯</span> Promotion Management</a>
       <a class="nav-item" data-page="reward-list"><span class="nav-icon">🎁</span> Reward History</a>
-      <a class="nav-item" data-page="reports"><span class="nav-icon">📈</span> Reports</a>
-      <a class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> Settings</a>
     </nav>
   </aside>
 
@@ -619,9 +616,9 @@ tbody tr.selected { background: var(--color-row-selected); border-left: 3px soli
          PAGE: WIZARD (Steps 1-4)
          ═══════════════════════════════════════ -->
     <div id="page-wizard" class="page-content hidden">
-      <div class="back-link" onclick="showPage('promo-list')">← Back to Promotion Management</div>
+      <div class="back-link" onclick="confirmLeaveWizard()">← Back to Promotion Management</div>
       <div class="page-title" id="wizard-page-title">Create Promotion</div>
-      <div class="page-desc">Complete the following steps to set up your promotion</div>
+      <div class="page-desc" id="wizard-page-desc">Complete the following steps to set up your promotion</div>
 
       <!-- Stepper -->
       <div class="stepper" id="wizard-stepper"></div>
@@ -750,7 +747,7 @@ tbody tr.selected { background: var(--color-row-selected); border-left: 3px soli
   <div class="modal">
     <div class="modal-header">
       <h3>⚠️ Confirm Deactivation</h3>
-      <span class="drawer-close" onclick="closeModal('deactivate-modal')">✕</span>
+      <span class="drawer-close" onclick="closeDeactivateModal()">✕</span>
     </div>
     <div class="modal-body">
       <p style="margin-bottom:var(--sp-lg)">Are you sure you want to deactivate <strong id="deactivate-name"></strong>?</p>
@@ -758,18 +755,19 @@ tbody tr.selected { background: var(--color-row-selected); border-left: 3px soli
         <strong>Impact:</strong><br>
         • Immediate stop for new player participation<br>
         • Prevent creation of new promotion instances<br>
-        • Existing active instances will NOT be affected
+        • Existing active instances will NOT be affected and can still be completed
       </div>
       <div class="form-group">
-        <label class="form-label">Remark <span class="required">*</span> <span class="text-muted">(min. 2 chars)</span></label>
-        <textarea class="form-input" rows="3" placeholder="Explain why this promotion is being disabled..."></textarea>
+        <label class="form-label">Remark <span class="required">*</span> <span class="text-muted">(Min 2 chars)</span></label>
+        <textarea class="form-input" id="deactivate-remark" rows="3" placeholder="Explain why this promotion is being disabled… (Min 2 chars)"></textarea>
+        <div class="form-error hidden" id="deactivate-remark-err">Remark is required (min. 2 characters).</div>
       </div>
       <div class="alert-box alert-info">
-        <strong>ℹ️ Notice:</strong> Disabling does NOT terminate active player instances. To cancel specific player bonus turnover, please use the Reward History page.
+        <strong>ℹ️ Notice:</strong> Disabling a promotion does NOT terminate active player instances. To cancel specific player bonus turnover, please use the Reward History page.
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('deactivate-modal')">Cancel</button>
+      <button class="btn btn-outline" onclick="closeDeactivateModal()">Cancel</button>
       <button class="btn btn-danger" onclick="confirmDeactivate()">Confirm Disable</button>
     </div>
   </div>
@@ -859,8 +857,8 @@ function renderPromoTable() {
       <td style="font-weight:500">${p.cost}</td>
       <td>${p.claims}</td>
       <td>
-        <label class="toggle" onclick="event.stopPropagation();togglePromoStatus(${i})">
-          <input type="checkbox" ${isEnabled?'checked':''}>
+        <label class="toggle" onclick="event.stopPropagation();event.preventDefault();togglePromoStatus(${i})">
+          <input type="checkbox" ${isEnabled?'checked':''} onclick="event.preventDefault()" tabindex="-1">
           <span class="toggle-slider"></span>
         </label>
         <span class="text-xs" style="margin-left:6px;color:${isEnabled?'var(--color-success)':'var(--color-text-muted)'}">${p.status}</span>
@@ -883,17 +881,39 @@ let pendingDeactivateIdx = null;
 function togglePromoStatus(idx) {
   const p = promotions[idx];
   if (p.status === 'Enabled') {
+    // Enabled → Disabled : requires confirmation per PRD §Enabled → Disabled 二次確認
     pendingDeactivateIdx = idx;
     document.getElementById('deactivate-name').textContent = `"${p.name}"`;
+    const ta = document.getElementById('deactivate-remark');
+    if (ta) { ta.value = ''; ta.classList.remove('input-error'); }
+    const err = document.getElementById('deactivate-remark-err');
+    if (err) err.classList.add('hidden');
     openModal('deactivate-modal');
   } else {
+    // Disabled → Enabled : direct toggle, no confirmation
     p.status = 'Enabled';
-    renderPromoTable();
   }
+  // Always re-render so the toggle visual never drifts from the data
+  renderPromoTable();
+}
+function closeDeactivateModal() {
+  // User cancelled the confirmation — ensure visual state is re-synced
+  pendingDeactivateIdx = null;
+  closeModal('deactivate-modal');
+  renderPromoTable();
 }
 function confirmDeactivate() {
+  const ta = document.getElementById('deactivate-remark');
+  const err = document.getElementById('deactivate-remark-err');
+  const remark = (ta && ta.value || '').trim();
+  if (remark.length < 2) {
+    if (ta) ta.classList.add('input-error');
+    if (err) err.classList.remove('hidden');
+    return;
+  }
   if (pendingDeactivateIdx !== null) {
     promotions[pendingDeactivateIdx].status = 'Disabled';
+    promotions[pendingDeactivateIdx].remark = remark;
     pendingDeactivateIdx = null;
     renderPromoTable();
   }
@@ -966,20 +986,78 @@ function renderStepper() {
 
 function renderWizardStep() {
   renderStepper();
+  // Wizard page title + description by mode (PRD §Create Promotion - 活動設定頁 模式 Create / Edit / View)
+  const pageTitleMap = { create: 'Create Promotion', edit: 'Edit Promotion', view: 'View Promotion' };
+  const pageDescMap  = {
+    create: 'Complete the following steps to set up your promotion',
+    edit:   'Edit this promotion’s configuration. You can only edit Disabled promotions.',
+    view:   'Review this promotion’s configuration (read-only).',
+  };
+  document.getElementById('wizard-page-title').textContent = pageTitleMap[wizardMode] || pageTitleMap.create;
+  document.getElementById('wizard-page-desc').textContent  = pageDescMap[wizardMode]  || pageDescMap.create;
+
   const info = stepInfo[currentStep - 1];
   document.getElementById('step-title').textContent = info.title;
   document.getElementById('step-desc').textContent = info.desc;
   for (let i = 1; i <= 4; i++) document.getElementById(`step-${i}-content`).classList.add('hidden');
   document.getElementById(`step-${currentStep}-content`).classList.remove('hidden');
   document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
-  document.getElementById('btn-next').textContent = currentStep === 4 ? '💾 Finish' : 'Next →';
-  if (currentStep === 4) document.getElementById('btn-next').classList.add('btn-success');
-  else document.getElementById('btn-next').classList.remove('btn-success');
+
+  // In View mode, hide Save and Finish — only allow stepping through
+  const btnSave = document.querySelector('.bottom-bar-right .btn.btn-outline-primary');
+  const btnNext = document.getElementById('btn-next');
+  if (wizardMode === 'view') {
+    if (btnSave) btnSave.classList.add('hidden');
+    btnNext.textContent = currentStep === 4 ? 'Done' : 'Next →';
+    btnNext.classList.remove('btn-success');
+  } else {
+    if (btnSave) btnSave.classList.remove('hidden');
+    btnNext.textContent = currentStep === 4 ? '💾 Finish' : 'Next →';
+    if (currentStep === 4) btnNext.classList.add('btn-success');
+    else btnNext.classList.remove('btn-success');
+  }
+}
+
+function validateStep3() {
+  // PRD §Step 3 Contribution Rules : Category Default is required (all 6 categories)
+  const inputs = document.querySelectorAll('.category-default-input');
+  let firstEmpty = null;
+  inputs.forEach(el => {
+    const v = (el.value || '').trim().replace('%','');
+    if (v === '' || isNaN(Number(v))) {
+      el.classList.add('input-error');
+      if (!firstEmpty) firstEmpty = el;
+    } else {
+      el.classList.remove('input-error');
+    }
+  });
+  if (firstEmpty) {
+    // Switch to Category Default tab so the user can see the errors
+    switchContribTab(0);
+    setTimeout(() => firstEmpty.focus(), 50);
+    showToast('error', 'Category Default Required', 'Please fill in Contribution Rate for all 6 categories (0–100%).');
+    return false;
+  }
+  return true;
 }
 
 function wizardNext() {
+  // In View mode, Next just steps through; Done on step 4 returns to the list
+  if (wizardMode === 'view') {
+    if (currentStep < 4) { currentStep++; renderWizardStep(); }
+    else showPage('promo-list');
+    return;
+  }
+  if (currentStep === 3 && !validateStep3()) return;
   if (currentStep < 4) { currentStep++; renderWizardStep(); }
-  else { showToast('success', 'Promotion Published', 'The promotion is now active.'); setTimeout(() => showPage('promo-list'), 800); }
+  else {
+    // PRD: Wizard 只負責儲存內容；新活動預設為 Disabled，實際啟用回 Promotion Management 處理
+    const msg = wizardMode === 'edit'
+      ? 'Promotion changes saved. Status remains Disabled — enable it from the Promotion Management list.'
+      : 'New promotion saved as Disabled. Enable it from the Promotion Management list.';
+    showToast('success', 'Saved Successfully', msg);
+    setTimeout(() => showPage('promo-list'), 900);
+  }
 }
 function wizardBack() { if (currentStep > 1) { currentStep--; renderWizardStep(); } }
 function wizardSave() {
@@ -1190,12 +1268,12 @@ document.getElementById('step-3-content').innerHTML = `
       <span class="contrib-tab" onclick="switchContribTab(2)">Game Override</span>
     </div>
     <div id="contrib-panel-0">
-      <table><thead><tr><th>Category</th><th style="width:120px">Contribution Rate</th></tr></thead>
+      <table><thead><tr><th>Category <span class="required">*</span></th><th style="width:120px">Contribution Rate <span class="required">*</span></th></tr></thead>
       <tbody>${['SLOT|100','FISH|80','TABLE|15','ARCADE|60','EGAME|50','LIVE|10'].map(r => {
         const [cat,rate] = r.split('|');
-        return '<tr><td style="font-weight:500">'+cat+'</td><td><input class="form-input" value="'+rate+'%" style="width:80px;text-align:center"></td></tr>';
+        return '<tr><td style="font-weight:500">'+cat+'</td><td><input class="form-input category-default-input" data-category="'+cat+'" value="'+rate+'%" placeholder="0-100%" style="width:80px;text-align:center" oninput="this.classList.remove(\'input-error\')"></td></tr>';
       }).join('')}</tbody></table>
-      <div class="form-hint mt-md">💡 0% = bets on this category won't contribute to bonus turnover progress</div>
+      <div class="form-hint mt-md">💡 All 6 categories are required. 0% = bets on this category won't contribute to bonus turnover progress.</div>
     </div>
     <div id="contrib-panel-1" class="hidden">
       <div class="flex justify-between items-center mb-md"><span class="text-sm text-muted">Override contribution rates for specific providers</span><button class="btn btn-outline btn-sm" onclick="addProviderRow()">+ Add Provider</button></div>
