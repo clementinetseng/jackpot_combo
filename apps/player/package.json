@@ -1,0 +1,11 @@
+{
+  "name": "igaming-frontend-prototype",
+  "version": "1.0.0",
+  "description": "iGaming Turnover Engine — Player-facing Frontend Prototype (Deposit / Withdraw / Gift Box / Reward Center / Record)",
+  "scripts": {
+    "start": "npx serve -s . -l $PORT"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

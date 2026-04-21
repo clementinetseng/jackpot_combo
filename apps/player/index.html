@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jackpot Combo — Frontend Prototype v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Poppins', 'sans-serif'] },
+      colors: {
+        lavender: { 50:'#F4EFFA', 100:'#E8E0F5', 200:'#D9CBE9', 300:'#C8B8E5', 400:'#A89ACC', 500:'#8E7DC0', 600:'#6B5B8E', 700:'#4A3B7A' },
+        brand:    { purple:'#8E66FF', purple2:'#B185FF', blue:'#6FB1FC', deep:'#5B46A6' },
+        accent:   { yellow:'#FFC107' },
+        ink:      { DEFAULT:'#2D1B4E', muted:'#6B5B8E', soft:'#8E7DC0' },
+        softborder:'#E5DCF5',
+      },
+      backgroundImage: {
+        'page-gradient': 'linear-gradient(140deg, #EBE3F7 0%, #D5C5EA 60%, #BFA8E1 100%)',
+        'banner-gradient': 'linear-gradient(90deg, #6FB1FC 0%, #8E66FF 60%, #B185FF 100%)',
+        'primary-pill': 'linear-gradient(90deg, #8E66FF 0%, #B185FF 100%)',
+        'primary-cta': 'linear-gradient(90deg, #6FB1FC 0%, #8E66FF 100%)',
+      },
+      boxShadow: {
+        card:      '0 4px 20px -6px rgba(139,102,255,0.15)',
+        cardHover: '0 10px 30px -8px rgba(139,102,255,0.25)',
+        pill:      '0 2px 8px -2px rgba(139,102,255,0.4)',
+      }
+    }
+  }
+}
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    html, body { font-family: 'Poppins', sans-serif; color: #2D1B4E; }
+    body { background: linear-gradient(140deg, #EBE3F7 0%, #D5C5EA 60%, #BFA8E1 100%); min-height: 100vh; }
+  }
+  @layer utilities {
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .progress-bar { background: linear-gradient(90deg, #8E66FF, #B185FF); }
+    [data-page] { display: none; }
+    [data-page].active { display: block; }
+    .toast-in { animation: toastIn .3s ease-out; }
+    @keyframes toastIn { from { opacity:0; transform:translateY(-20px);} to { opacity:1; transform:translateY(0);} }
+    .drawer-enter { animation: drawerIn .25s ease-out; }
+    @keyframes drawerIn { from { transform:translateX(100%);} to { transform:translateX(0);} }
+    .hidden-visible { visibility:hidden; pointer-events:none; opacity:0; }
+    .visible-now { visibility:visible; pointer-events:auto; opacity:1; transition: opacity .2s; }
+    .gradient-divider { background: linear-gradient(90deg,#8E66FF 0%,#B185FF 40%,transparent 100%); height:1px; }
+    .wallet-pill-glow { box-shadow: 0 0 0 4px rgba(255,255,255,0.2); }
+  }
+  @layer components {
+    .chip { @apply px-5 py-2.5 rounded-full bg-white border border-softborder text-sm font-semibold text-ink-muted hover:border-brand-purple transition; }
+    .chip.active { @apply bg-white text-ink font-bold border-brand-purple shadow-pill; }
+    .chip-amount { @apply px-4 py-3 rounded-[10px] bg-white border-2 border-softborder text-center text-ink-muted font-semibold hover:border-brand-purple hover:text-brand-purple transition cursor-pointer; }
+    .chip-amount.active { @apply bg-primary-pill text-white font-extrabold border-transparent shadow-pill; }
+    .badge { @apply inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold; }
+    .btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition; }
+    .btn-primary { @apply btn bg-primary-cta text-white hover:shadow-pill disabled:bg-gradient-to-r disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none; }
+    .btn-ghost { @apply btn bg-white/60 text-ink-muted hover:bg-white; }
+    .btn-outline { @apply btn bg-white border border-softborder text-ink-muted hover:border-brand-purple; }
+    .tab-pill { @apply px-4 md:px-8 py-2 md:py-2.5 rounded-full text-sm font-semibold text-center transition cursor-pointer; }
+    .tab-pill.active { @apply bg-primary-pill text-white shadow-pill; }
+    .tab-pill.inactive { @apply bg-lavender-50 text-ink-muted border border-softborder hover:border-brand-purple; }
+    .card { @apply bg-white rounded-[14px] shadow-card; }
+    .card-hover { @apply hover:shadow-cardHover transition; }
+    .info-box { @apply bg-lavender-50 border border-softborder rounded-[10px] p-3 text-sm; }
+    .sidebar-item { @apply flex items-center gap-3 px-4 py-3 rounded-full text-white/85 hover:bg-white/15 transition text-sm; }
+    .sidebar-item.active { @apply bg-white text-brand-purple font-bold shadow-pill; }
+    .sidebar-action.active { @apply bg-primary-pill text-white !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============================== -->
+<!--  HEADER                        -->
+<!-- ============================== -->
+<header class="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-white/50">
+  <div class="max-w-[1440px] mx-auto px-3 lg:px-6 h-[60px] md:h-[64px] flex items-center justify-between gap-2 md:gap-4">
+    <div class="flex items-center gap-3 md:gap-6 flex-1 min-w-0">
+      <button class="lg:hidden w-9 h-9 flex items-center justify-center text-xl text-ink hover:bg-white/50 rounded-full" aria-label="Menu" onclick="toggleMobileDrawer()">☰</button>
+      <a href="#" class="flex items-center gap-2 shrink-0">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-primary-pill flex items-center justify-center text-white font-extrabold">J</div>
+        <span class="font-extrabold text-lg text-ink hidden lg:inline">jackpot combo</span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-1 text-sm text-ink-muted font-medium">
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Feature</a>
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Slot</a>
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Fish</a>
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Live</a>
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Egame</a>
+        <a class="px-3 py-2 hover:text-brand-purple" href="#">Combo</a>
+      </nav>
+    </div>
+    <!-- Right -->
+    <div class="flex items-center gap-1.5 md:gap-2">
+      <!-- Balance Pill (always shown, compact on mobile) -->
+      <div class="flex items-center gap-1 md:gap-2 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full bg-primary-pill text-white text-xs md:text-sm">
+        <span>₱</span>
+        <span class="font-bold" data-sync="balance-header">0.00</span>
+        <button class="hidden md:inline text-white/70 hover:text-white text-xs" onclick="refreshBalance()" aria-label="Refresh">↻</button>
+      </div>
+      <!-- Primary Deposit CTA (desktop) -->
+      <a href="#/deposit" class="hidden md:inline-flex items-center px-5 py-2 rounded-full bg-accent-yellow text-ink font-bold text-sm hover:brightness-110 transition shadow-pill">Deposit</a>
+      <!-- Gift Box -->
+      <button id="giftBoxBtn" class="relative w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/70 hover:bg-white flex items-center justify-center text-base md:text-lg" aria-label="Rewards" onclick="toggleGiftBox()">
+        🎁
+        <span id="giftBadge" class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-purple text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">3</span>
+      </button>
+      <!-- User (avatar only on mobile, full on desktop) -->
+      <button class="flex items-center gap-2 pr-0 md:pr-3 pl-1 py-1 rounded-full bg-white/80 hover:bg-white transition" onclick="toast('Profile menu — out of prototype scope', 'ℹ️', 2000)" aria-label="Profile">
+        <div class="w-7 h-7 rounded-full bg-primary-pill flex items-center justify-center text-white text-xs font-bold">T</div>
+        <span class="hidden md:inline text-sm font-semibold text-ink">testwc</span>
+      </button>
+      <button class="hidden md:flex w-10 h-10 rounded-full bg-white/70 hover:bg-white items-center justify-center text-lg" aria-label="Support">🎧</button>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE DRAWER (Sidebar content on small screens) -->
+<div id="mobileDrawerBackdrop" class="fixed inset-0 bg-ink/40 z-40 hidden-visible lg:hidden" onclick="toggleMobileDrawer(false)"></div>
+<aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 w-[280px] max-w-[85vw] bg-gradient-to-b from-lavender-400 to-lavender-500 z-50 hidden-visible lg:hidden overflow-y-auto no-scrollbar transform -translate-x-full transition-transform">
+  <div class="p-4">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-brand-purple font-extrabold">J</div>
+        <span class="font-extrabold text-lg text-white">jackpot combo</span>
+      </div>
+      <button class="text-white/80 hover:text-white text-xl w-9 h-9 rounded-full hover:bg-white/15 flex items-center justify-center" onclick="toggleMobileDrawer(false)" aria-label="Close">✕</button>
+    </div>
+    <div class="bg-white/90 rounded-[14px] p-3 mb-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-primary-pill flex items-center justify-center text-white text-xs font-bold">T</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold truncate text-ink text-sm">testwc</div>
+        <div class="text-[11px] text-ink-muted truncate">ID: d4bdht9ivj3s7...</div>
+      </div>
+    </div>
+    <div class="mb-3 text-white">
+      <div class="text-[11px] opacity-80">Total Balance</div>
+      <div class="text-xl font-extrabold text-accent-yellow">₱<span data-sync="balance-drawer">0.00</span></div>
+    </div>
+    <nav class="space-y-0.5 text-white">
+      <a href="#/casino" class="sidebar-item" onclick="toggleMobileDrawer(false)">🎰 <span>Casino</span></a>
+      <a href="#/provider" class="sidebar-item" onclick="toggleMobileDrawer(false)">🏢 <span>Provider</span></a>
+      <a href="#" class="sidebar-item" onclick="toggleMobileDrawer(false)">🎧 <span>Support</span></a>
+      <a href="#" class="sidebar-item" onclick="toggleMobileDrawer(false)">⭐ <span>About Us</span></a>
+      <a href="#" class="sidebar-item" onclick="toggleMobileDrawer(false)">🚪 <span>Logout</span></a>
+    </nav>
+  </div>
+</aside>
+
+<!-- ============================== -->
+<!--  LAYOUT                        -->
+<!-- ============================== -->
+<div class="max-w-[1440px] mx-auto flex gap-6 px-0 lg:px-6 py-3 md:py-4 lg:py-6 pb-24 lg:pb-6">
+
+  <!-- SIDEBAR -->
+  <aside class="hidden lg:flex flex-col w-[220px] shrink-0">
+    <div class="bg-gradient-to-b from-lavender-400 to-lavender-500 rounded-[20px] p-4 shadow-card">
+      <!-- User card -->
+      <div class="bg-white/90 rounded-[14px] p-3 mb-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-pill flex items-center justify-center text-white text-xs font-bold">T</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold truncate text-ink text-sm">testwc</div>
+          <div class="text-[11px] text-ink-muted truncate">ID: d4bdht9ivj3s7... 📋</div>
+        </div>
+      </div>
+      <!-- Balance -->
+      <div class="mb-3 text-white">
+        <div class="text-[11px] opacity-80 flex items-center gap-1">Balance 👁️</div>
+        <div class="text-xl font-extrabold text-accent-yellow flex items-center gap-1.5">
+          ₱<span data-sync="balance-sidebar">0.00</span>
+          <button class="text-white/70 hover:text-white text-sm" onclick="refreshBalance()">↻</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <a href="#/deposit" data-nav="deposit" class="sidebar-action flex items-center justify-center gap-1 py-2 rounded-full text-xs font-bold bg-white/80 hover:bg-white text-ink">💳 Deposit</a>
+        <a href="#/withdraw" data-nav="withdraw" class="sidebar-action flex items-center justify-center gap-1 py-2 rounded-full text-xs font-bold bg-white/80 hover:bg-white text-ink">💸 Withdraw</a>
+      </div>
+      <!-- Nav -->
+      <nav class="space-y-0.5 text-white">
+        <a href="#/casino" class="sidebar-item">🎰 <span>Casino</span></a>
+        <a href="#/provider" class="sidebar-item">🏢 <span>Provider</span></a>
+        <a href="#/rewards" data-nav="rewards" class="sidebar-item">🎁 <span>Rewards</span></a>
+        <a href="#/record" data-nav="record" class="sidebar-item">📋 <span>Records</span></a>
+        <a href="#/support" class="sidebar-item">🎧 <span>Support</span></a>
+        <a href="#" class="sidebar-item">⭐ <span>About Us</span></a>
+        <a href="#" class="sidebar-item">🚪 <span>Logout</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0 px-3 md:px-4 lg:px-0">
+    <div id="page-deposit" data-page="deposit" class="space-y-3 md:space-y-4"></div>
+    <div id="page-withdraw" data-page="withdraw" class="space-y-3 md:space-y-4"></div>
+    <div id="page-rewards" data-page="rewards" class="space-y-3 md:space-y-4"></div>
+    <div id="page-record" data-page="record" class="space-y-3 md:space-y-4"></div>
+
+    <!-- Footer -->
+    <footer class="mt-10 pt-6 text-center text-xs text-ink-muted space-x-4">
+      <span class="gradient-divider block w-full mb-4 opacity-40"></span>
+      <a href="#" class="hover:text-brand-purple">FAQ</a>
+      <span>·</span>
+      <a href="#" class="hover:text-brand-purple">Need help? Contact Support</a>
+      <div class="mt-2 opacity-60">© Jackpot Combo · PH Frontend Prototype v2.0</div>
+    </footer>
+  </main>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-softborder z-20">
+  <div class="grid grid-cols-5 text-[11px] text-ink-muted">
+    <a href="#/casino" class="flex flex-col items-center justify-center py-2 gap-1"><span class="text-lg">🏠</span><span>Casino</span></a>
+    <a href="#/deposit" data-nav-m="deposit" class="flex flex-col items-center justify-center py-2 gap-1"><span class="text-lg">💳</span><span>Deposit</span></a>
+    <a href="#/withdraw" data-nav-m="withdraw" class="flex flex-col items-center justify-center py-2 gap-1"><span class="text-lg">💸</span><span>Withdraw</span></a>
+    <a href="#/rewards" data-nav-m="rewards" class="flex flex-col items-center justify-center py-2 gap-1"><span class="text-lg">🎁</span><span>Rewards</span></a>
+    <a href="#/record" data-nav-m="record" class="flex flex-col items-center justify-center py-2 gap-1"><span class="text-lg">📋</span><span>Records</span></a>
+  </div>
+</nav>
+
+<!-- GIFT BOX DROPDOWN -->
+<div id="giftBoxBackdrop" class="fixed inset-0 bg-ink/20 z-40 hidden-visible" onclick="toggleGiftBox(false)"></div>
+<aside id="giftBoxPanel" class="fixed right-4 top-[72px] w-[380px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-88px)] bg-white rounded-[20px] shadow-cardHover z-50 overflow-hidden hidden-visible flex flex-col border border-softborder">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-softborder bg-primary-pill text-white">
+    <div class="font-bold flex items-center gap-2">🎁 Rewards</div>
+    <button class="text-white/80 hover:text-white" onclick="toggleGiftBox(false)">✕</button>
+  </div>
+  <div id="giftBoxContent" class="overflow-y-auto flex-1 no-scrollbar"></div>
+  <div class="p-3 border-t border-softborder bg-lavender-50">
+    <a href="#/rewards" class="btn-primary w-full" onclick="toggleGiftBox(false)">All Rewards →</a>
+  </div>
+</aside>
+
+<!-- T&C MODAL -->
+<div id="tncBackdrop" class="fixed inset-0 bg-ink/40 z-50 hidden-visible" onclick="closeModal()"></div>
+<div id="tncModal" class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[560px] max-w-[calc(100vw-2rem)] max-h-[80vh] bg-white rounded-[20px] shadow-cardHover z-[60] hidden-visible flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-softborder bg-primary-pill text-white rounded-t-[20px]">
+    <h3 class="font-bold text-lg" id="tncTitle">Terms & Conditions</h3>
+    <button class="text-white/80 hover:text-white" onclick="closeModal()">✕</button>
+  </div>
+  <div class="p-5 overflow-y-auto text-sm text-ink-muted leading-relaxed" id="tncBody"></div>
+</div>
+
+<!-- DRAWER -->
+<div id="drawerBackdrop" class="fixed inset-0 bg-ink/40 z-50 hidden-visible" onclick="closeDrawer()"></div>
+<aside id="drawer" class="fixed right-0 top-0 bottom-0 w-[440px] max-w-full bg-white shadow-cardHover z-[60] hidden-visible flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-softborder bg-primary-pill text-white">
+    <h3 class="font-bold" id="drawerTitle">Promotion Detail</h3>
+    <button class="text-white/80 hover:text-white" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="p-5 overflow-y-auto flex-1" id="drawerBody"></div>
+</aside>
+
+<!-- TOAST -->
+<div id="toastWrap" class="fixed top-[80px] left-1/2 -translate-x-1/2 z-[70] space-y-2 pointer-events-none w-[calc(100%-2rem)] max-w-[440px] flex flex-col items-center"></div>
+
+<!-- DEMO CONTROLS -->
+<div id="demoControls" class="fixed bottom-4 right-4 z-40 hidden md:block">
+  <details class="bg-white rounded-[14px] shadow-cardHover w-[280px] overflow-hidden border border-softborder">
+    <summary class="cursor-pointer px-4 py-2.5 bg-primary-pill text-white text-sm font-semibold flex items-center justify-between">
+      🎮 Demo Controls
+      <span class="text-xs opacity-70">click to toggle</span>
+    </summary>
+    <div class="p-4 space-y-3 text-sm">
+      <div>
+        <label class="block text-xs text-ink-muted mb-1">Scenario</label>
+        <select class="w-full border border-softborder rounded-lg px-2 py-1.5 text-sm" onchange="setScenario(this.value)" id="scenarioSelect">
+          <option value="clean">A. Clean slate (可提款)</option>
+          <option value="depositTurnover">B. 存款流水未清</option>
+          <option value="active">C. Active Promotion 進行中</option>
+          <option value="activePending">D. Active + 2 Pending</option>
+          <option value="balanceZero">E. Balance = ₱0</option>
+          <option value="oob">F. 剛 OOB（正常流程）</option>
+        </select>
+      </div>
+      <div class="text-xs text-ink-muted border-t pt-2 space-y-0.5">
+        <div>Balance: ₱<span data-sync="balance-demo">0.00</span></div>
+        <div>Withdrawable: ₱<span data-sync="withdrawable-demo">0.00</span></div>
+        <div>Active: <span data-sync="active-demo">None</span></div>
+        <div>KYC: <span data-sync="kyc-demo">✓ Passed</span></div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ============================== -->
+<!--  SCRIPT                        -->
+<!-- ============================== -->
+<script>
+/* ================ DEMO DATA ================ */
+const ELIGIBLE_PROMOS = [
+  { id:'p1', tag:'FIRST DEPOSIT', icon:'🎁', title:'100% First Deposit Bonus',
+    subtext:'Up to ₱5,000 · 30x Turnover', period:'Apr 10 ~ Apr 30',
+    bonusPct:100, bonusCap:5000, minDeposit:500, maxDeposit:50000, model:'A', multiplier:30,
+    tnc:'Players who made their first deposit between the promotion period are eligible. Bonus capped at ₱5,000. Turnover: (Deposit + Bonus) × 30.' },
+  { id:'p2', tag:'RELOAD', icon:'💰', title:'50% Reload Bonus',
+    subtext:'Up to ₱2,000 · 25x Turnover', period:'Apr 15 ~ May 15',
+    bonusPct:50, bonusCap:2000, minDeposit:300, maxDeposit:20000, model:'A', multiplier:25,
+    tnc:'Available to existing players. Max bonus ₱2,000. Turnover: 25× (Deposit + Bonus).' },
+  { id:'p3', tag:'WEEKLY', icon:'🎰', title:'₱200 Slots Cashback',
+    subtext:'Fixed ₱200 · 20x Turnover', period:'Apr 12 ~ Apr 18',
+    bonusFixed:200, minDeposit:1000, maxDeposit:10000, model:'C', multiplier:20,
+    tnc:'Weekly cashback exclusive for slot players. Bonus ₱200 granted on qualifying deposits.' },
+];
+const SAMPLE_RECORDS = [
+  { id:'r1', promo:'100% First Deposit Bonus', tag:'FIRST DEPOSIT', joined:'2026/04/14 10:22:15', principal:1000, bonus:500, target:45000, progress:31800, status:'ACTIVE' },
+  { id:'r2', promo:'50% Reload Bonus', tag:'RELOAD', joined:'2026/03/22 19:45:02', principal:800, bonus:400, target:30000, progress:30000, status:'COMPLETED' },
+  { id:'r3', promo:'₱200 Slots Cashback', tag:'WEEKLY', joined:'2026/03/10 14:10:30', principal:1500, bonus:200, target:4000, progress:2200, status:'OUT_OF_BALANCE' },
+  { id:'r4', promo:'Daily Bonus', tag:'DAILY', joined:'2026/02/28 09:00:44', principal:500, bonus:100, target:12000, progress:8500, status:'CANCELLED' },
+];
+
+/* ================ STATE ================ */
+const state = {
+  balance: 6882.43, withdrawable: 6882.43,
+  activePromo: null, pendingPromos: [],
+  depositTurnover: { target:0, progress:0 },
+  kycPassed: true, justOOB: false, giftUnread: 3,
+  minWithdrawal: 50, minDeposit: 500, maxDeposit: 50000,
+};
+const STATUS_LABEL = {
+  ACTIVE:     { text:'Active',             cls:'bg-brand-purple/15 text-brand-purple' },
+  PENDING:    { text:'Pending',            cls:'bg-lavender-100 text-ink-muted' },
+  COMPLETED:  { text:'Completed 🎉',       cls:'bg-green-100 text-green-700' },
+  OUT_OF_BALANCE: { text:'Ended (low balance)', cls:'bg-yellow-100 text-yellow-700' },
+  CANCELLED:  { text:'Cancelled',          cls:'bg-orange-100 text-orange-700' },
+};
+
+/* ================ UTIL ================ */
+const fmt = n => '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const fmtInt = n => '₱' + Math.round(Number(n)).toLocaleString('en-PH');
+const pct = (p,t) => t>0 ? Math.min(100, (p/t)*100) : 0;
+const syncDomByKey = (k,v) => document.querySelectorAll(`[data-sync="${k}"]`).forEach(el => el.textContent = v);
+const getPromo = id => ELIGIBLE_PROMOS.find(p => p.id === id);
+
+/* ================ TURNOVER STATUS ================ */
+function getTurnoverStatus() {
+  if (state.activePromo) {
+    const { target, progress, promoId } = state.activePromo;
+    return { type:'bonus', icon:'🎰', label:'Bonus Turnover', target, progress, remain:Math.max(0,target-progress), pct:pct(progress,target), promoTitle: getPromo(promoId)?.title || 'Active Promotion' };
+  }
+  if (state.depositTurnover.target > state.depositTurnover.progress) {
+    const { target, progress } = state.depositTurnover;
+    return { type:'deposit', icon:'💰', label:'Deposit Turnover', target, progress, remain:target-progress, pct:pct(progress,target) };
+  }
+  return { type:'ok', icon:'✅', label:'Withdrawable', withdrawable:state.withdrawable };
+}
+function renderStatusCard(s) {
+  if (s.type === 'ok') {
+    return `<div class="bg-green-50 border border-green-200 rounded-[14px] p-4 flex items-center gap-3">
+      <div class="text-2xl">✅</div>
+      <div class="flex-1"><div class="text-xs text-ink-muted">Ready to withdraw</div><div class="text-lg font-bold">${fmt(s.withdrawable)}</div></div>
+    </div>`;
+  }
+  const title = s.type==='bonus' ? `🎰 ${s.promoTitle}` : '💰 Deposit Turnover';
+  return `<div class="bg-lavender-50 border border-softborder rounded-[14px] p-4">
+    <div class="flex items-center justify-between mb-2"><div class="font-semibold text-sm">${title}</div><span class="text-xs text-ink-muted">${s.pct.toFixed(0)}%</span></div>
+    <div class="h-2 bg-white rounded-full overflow-hidden mb-2"><div class="h-full progress-bar rounded-full" style="width:${s.pct}%"></div></div>
+    <div class="flex items-center justify-between text-xs"><span class="text-ink-muted">Bet <strong class="text-ink">${fmtInt(s.remain)}</strong> more to withdraw</span><span class="text-ink-muted/70">${fmtInt(s.progress)} / ${fmtInt(s.target)}</span></div>
+  </div>`;
+}
+
+/* ================ SYNC ================ */
+function syncAll() {
+  const bal = fmt(state.balance).replace('₱','');
+  syncDomByKey('balance-header', bal);
+  syncDomByKey('balance-sidebar', bal);
+  syncDomByKey('balance-drawer', bal);
+  syncDomByKey('balance-demo', bal);
+  syncDomByKey('withdrawable-demo', fmt(state.withdrawable).replace('₱',''));
+  syncDomByKey('active-demo', state.activePromo ? (getPromo(state.activePromo.promoId)?.title || 'Yes') : 'None');
+  syncDomByKey('kyc-demo', state.kycPassed ? '✓ Passed' : '✗ Required');
+  const badge = document.getElementById('giftBadge');
+  if (badge) {
+    if (state.giftUnread > 0) { badge.textContent = state.giftUnread; badge.style.display = ''; } else badge.style.display = 'none';
+  }
+}
+
+/* ================ ROUTER ================ */
+function route() {
+  const hash = (location.hash || '#/deposit').replace(/^#\//,'');
+  const page = ['deposit','withdraw','rewards','record'].includes(hash) ? hash : 'deposit';
+  document.querySelectorAll('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  document.querySelectorAll('[data-nav], [data-nav-m]').forEach(el => {
+    const key = el.dataset.nav || el.dataset.navM;
+    const isActive = key === page;
+    el.classList.toggle('active', isActive);
+    if (el.dataset.navM) {
+      el.classList.toggle('text-brand-purple', isActive);
+      el.classList.toggle('font-bold', isActive);
+    }
+  });
+  renderPage(page);
+  window.scrollTo({ top:0, behavior:'instant' });
+}
+window.addEventListener('hashchange', route);
+
+/* ================ TOAST/MODAL/DRAWER ================ */
+function toast(msg, icon='✅', dur=3200) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast-in bg-white shadow-cardHover rounded-full px-5 py-3 flex items-center gap-3 min-w-[280px] max-w-[440px] pointer-events-auto border border-softborder';
+  el.innerHTML = `<span class="text-xl">${icon}</span><span class="text-sm font-medium flex-1 text-ink">${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(), 300); }, dur);
+}
+function openModal(title, body) {
+  document.getElementById('tncTitle').textContent = title;
+  document.getElementById('tncBody').innerHTML = body;
+  document.getElementById('tncBackdrop').classList.replace('hidden-visible','visible-now');
+  document.getElementById('tncModal').classList.replace('hidden-visible','visible-now');
+}
+function closeModal() {
+  document.getElementById('tncBackdrop').classList.replace('visible-now','hidden-visible');
+  document.getElementById('tncModal').classList.replace('visible-now','hidden-visible');
+}
+function openDrawer(title, body) {
+  document.getElementById('drawerTitle').textContent = title;
+  document.getElementById('drawerBody').innerHTML = body;
+  document.getElementById('drawerBackdrop').classList.replace('hidden-visible','visible-now');
+  const d = document.getElementById('drawer');
+  d.classList.replace('hidden-visible','visible-now'); d.classList.add('drawer-enter');
+}
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.replace('visible-now','hidden-visible');
+  document.getElementById('drawer').classList.replace('visible-now','hidden-visible');
+}
+function toggleMobileDrawer(force) {
+  const bd = document.getElementById('mobileDrawerBackdrop');
+  const pn = document.getElementById('mobileDrawer');
+  const open = force !== undefined ? force : bd.classList.contains('hidden-visible');
+  if (open) {
+    bd.classList.replace('hidden-visible','visible-now');
+    pn.classList.replace('hidden-visible','visible-now');
+    pn.classList.remove('-translate-x-full');
+  } else {
+    bd.classList.replace('visible-now','hidden-visible');
+    pn.classList.add('-translate-x-full');
+    setTimeout(()=>pn.classList.replace('visible-now','hidden-visible'), 200);
+  }
+}
+function toggleGiftBox(force) {
+  const bd = document.getElementById('giftBoxBackdrop');
+  const pn = document.getElementById('giftBoxPanel');
+  const open = force !== undefined ? force : bd.classList.contains('hidden-visible');
+  if (open) {
+    renderGiftBox();
+    bd.classList.replace('hidden-visible','visible-now');
+    pn.classList.replace('hidden-visible','visible-now');
+    state.giftUnread = 0; syncAll();
+  } else {
+    bd.classList.replace('visible-now','hidden-visible');
+    pn.classList.replace('visible-now','hidden-visible');
+  }
+}
+function refreshBalance() { syncAll(); toast('Balance refreshed', '↻', 1500); }
+
+/* ================ SCENARIOS ================ */
+function setScenario(s) {
+  switch(s) {
+    case 'clean': state.balance=6882.43; state.withdrawable=6882.43; state.activePromo=null; state.pendingPromos=[]; state.depositTurnover={target:0,progress:0}; state.kycPassed=true; state.justOOB=false; break;
+    case 'depositTurnover': state.balance=3200; state.withdrawable=0; state.activePromo=null; state.pendingPromos=[]; state.depositTurnover={target:3000,progress:600}; state.kycPassed=true; state.justOOB=false; break;
+    case 'active': state.balance=4500; state.withdrawable=0; state.activePromo={promoId:'p1',principal:1000,bonus:500,target:45000,progress:31800}; state.pendingPromos=[]; state.depositTurnover={target:1000,progress:1000}; state.kycPassed=true; state.justOOB=false; break;
+    case 'activePending': state.balance=6200; state.withdrawable=0; state.activePromo={promoId:'p1',principal:1000,bonus:500,target:45000,progress:12000}; state.pendingPromos=[{promoId:'p2',principal:800,bonus:400,target:30000},{promoId:'p3',principal:1500,bonus:200,target:4000}]; state.depositTurnover={target:3300,progress:3300}; state.kycPassed=true; state.justOOB=false; break;
+    case 'balanceZero': state.balance=0; state.withdrawable=0; state.activePromo=null; state.pendingPromos=[]; state.depositTurnover={target:0,progress:0}; state.kycPassed=true; state.justOOB=false; break;
+    case 'oob': state.balance=12.50; state.withdrawable=12.50; state.activePromo=null; state.pendingPromos=[]; state.depositTurnover={target:0,progress:0}; state.kycPassed=true; state.justOOB=true; break;
+  }
+  syncAll(); route();
+}
+
+function renderPage(page) {
+  if (page==='deposit') renderDeposit();
+  if (page==='withdraw') renderWithdraw();
+  if (page==='rewards') renderRewards();
+  if (page==='record') renderRecord();
+}
+
+/* ================ PAGE HEADER (Wallet-style) ================ */
+function pageHeader(title, showBanner=true) {
+  const banner = showBanner ? `
+    <div class="bg-banner-gradient rounded-[16px] md:rounded-[20px] p-4 md:p-6 shadow-card text-white relative overflow-hidden">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="min-w-0">
+          <div class="text-[11px] opacity-80">Total Balance</div>
+          <div class="text-2xl md:text-3xl font-extrabold mt-0.5 flex items-center gap-2">
+            ₱<span>${fmt(state.balance).replace('₱','')}</span>
+            <button class="text-white/70 hover:text-white text-base md:text-xl" onclick="refreshBalance()" aria-label="Refresh">↻</button>
+          </div>
+          <div class="text-[11px] opacity-80 mt-1">Withdrawable: <strong>${fmt(state.withdrawable)}</strong></div>
+        </div>
+        <a href="#/record" class="bg-white/20 hover:bg-white/30 rounded-full px-4 py-2 md:px-5 md:py-2.5 backdrop-blur text-xs md:text-sm font-semibold shrink-0">📋 Record Center →</a>
+      </div>
+    </div>` : '';
+  return `<div class="flex items-center gap-2 mb-1"><button onclick="history.back()" class="w-9 h-9 rounded-full hover:bg-white/40 text-ink text-xl flex items-center justify-center" aria-label="Back">←</button><h1 class="text-xl md:text-2xl font-bold text-ink">${title}</h1></div>
+  <div class="gradient-divider mb-3 md:mb-4"></div>${banner}`;
+}
+
+/* ============================================= */
+/*  DEPOSIT PAGE (PP 骨架 + 促銷插入)              */
+/* ============================================= */
+let depositAmount = 0;
+let selectedPromoId = 'none';
+let promoDropdownOpen = false;
+
+function renderDeposit() {
+  const root = document.getElementById('page-deposit');
+  const quickAmounts = [100, 200, 500, 1000, 10000, 50000];
+  const eligible = ELIGIBLE_PROMOS.filter(p => depositAmount===0 || (depositAmount>=p.minDeposit && depositAmount<=p.maxDeposit));
+
+  // OOB Welcome banner removed per Clement #3 — OOB returns to normal flow
+
+  // Deposit 頁不再顯示 TurnoverStatus 卡（Clement #2：冗餘）
+  // 流水資訊在 Wallet pill / Gift Box / Reward Center 已有。選 Promotion 時的 Lock Warning 才是這頁該提醒的
+  const amountChips = quickAmounts.map(a =>
+    `<button class="chip-amount ${depositAmount===a?'active':''}" onclick="setDepositAmount(${a})">${a.toLocaleString()}</button>`
+  ).join('');
+
+  let validationMsg = '';
+  if (depositAmount > 0) {
+    if (depositAmount < state.minDeposit) validationMsg = `Minimum deposit: ${fmtInt(state.minDeposit)}`;
+    else if (depositAmount > state.maxDeposit) validationMsg = `Maximum deposit: ${fmtInt(state.maxDeposit)}`;
+    else if (selectedPromoId && selectedPromoId !== 'none') {
+      const p = getPromo(selectedPromoId);
+      if (p && depositAmount < p.minDeposit) validationMsg = `Min ${fmtInt(p.minDeposit)} for this promotion`;
+      else if (p && depositAmount > p.maxDeposit) validationMsg = `Max ${fmtInt(p.maxDeposit)} for this promotion`;
+    }
+  }
+
+  // Promotion Dropdown (collapsed-by-default, radio-list style)
+  const selectedPromo = selectedPromoId === 'none' ? null : getPromo(selectedPromoId);
+  const selectedLabel = selectedPromo
+    ? `<span class="text-xl">${selectedPromo.icon}</span><div class="text-left flex-1 min-w-0"><span class="badge bg-brand-purple/15 text-brand-purple text-[10px]">${selectedPromo.tag}</span><div class="text-sm font-semibold text-ink truncate">${selectedPromo.title}</div></div>`
+    : `<span class="text-xl">🚫</span><div class="text-left flex-1"><div class="text-sm font-semibold text-ink">No Promotion</div><div class="text-[11px] text-ink-muted">Deposit with no lock</div></div>`;
+
+  const dropdownItems = [
+    `<button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-lavender-50 ${selectedPromoId==='none'?'bg-lavender-50':''}" onclick="selectPromo('none')">
+      <span class="text-xl">🚫</span>
+      <div class="flex-1 text-left"><div class="text-sm font-semibold text-ink">No Promotion</div><div class="text-[11px] text-ink-muted">Deposit with no lock · Withdraw anytime</div></div>
+      <span class="w-5 h-5 rounded-full border-2 ${selectedPromoId==='none'?'border-brand-purple bg-brand-purple':'border-softborder'} flex items-center justify-center">${selectedPromoId==='none'?'<span class=\"w-2 h-2 rounded-full bg-white\"></span>':''}</span>
+    </button>`,
+    ...eligible.map(p => `
+    <button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-lavender-50 ${selectedPromoId===p.id?'bg-lavender-50':''}" onclick="selectPromo('${p.id}')">
+      <span class="text-xl">${p.icon}</span>
+      <div class="flex-1 text-left min-w-0">
+        <div class="flex items-center gap-1"><span class="badge bg-brand-purple/15 text-brand-purple text-[10px]">${p.tag}</span><span class="text-[10px] text-ink-muted/70">Min ${fmtInt(p.minDeposit)}</span></div>
+        <div class="text-sm font-semibold text-ink truncate mt-0.5">${p.title}</div>
+        <div class="text-[11px] text-ink-muted truncate">${p.subtext}</div>
+      </div>
+      <span class="w-5 h-5 rounded-full border-2 ${selectedPromoId===p.id?'border-brand-purple bg-brand-purple':'border-softborder'} flex items-center justify-center shrink-0">${selectedPromoId===p.id?'<span class=\"w-2 h-2 rounded-full bg-white\"></span>':''}</span>
+    </button>`)
+  ].join('<div class="border-t border-softborder"></div>');
+
+  const promoDropdown = `
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-semibold text-ink">Choose your bonus</label>
+        ${depositAmount > 0 ? `<span class="text-xs text-ink-muted">${eligible.length} available for this amount</span>` : `<span class="text-xs text-ink-muted">${ELIGIBLE_PROMOS.length} available</span>`}
+      </div>
+      <div class="bg-white rounded-[14px] border ${promoDropdownOpen?'border-brand-purple':'border-softborder'} overflow-hidden">
+        <button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-lavender-50" onclick="togglePromoDropdown()">
+          ${selectedLabel}
+          <span class="text-ink-muted transition-transform ${promoDropdownOpen?'rotate-180':''}">▼</span>
+        </button>
+        ${promoDropdownOpen ? `<div class="border-t border-softborder max-h-[320px] overflow-y-auto">${dropdownItems}</div>` : ''}
+      </div>
+      ${selectedPromo ? `<div class="mt-2 px-1 text-xs"><button class="text-brand-purple hover:underline font-semibold" onclick="openTnc('${selectedPromo.id}')">View T&C for ${selectedPromo.title} →</button></div>` : ''}
+      ${(selectedPromoId && selectedPromoId!=='none' && state.activePromo) ? `<div class="info-box mt-2 flex items-start gap-2"><span>ℹ️</span><span class="text-ink-muted">You already have an active promotion. This one will start after your current one ends.</span></div>` : ''}
+    </div>`;
+
+  const summary = renderDepositSummary();
+  const submitEnabled = depositAmount >= state.minDeposit && !validationMsg;
+  const submitLabel = (selectedPromoId && selectedPromoId !== 'none') ? 'Deposit & Join Promotion' : 'Submit';
+
+  root.innerHTML = `
+    ${pageHeader('Wallet')}
+    <div class="card p-4 md:p-6 mt-4">
+      <div class="flex flex-col md:grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+        <div class="flex flex-row md:flex-col gap-2 w-full md:w-auto">
+          <a href="#/deposit" class="tab-pill active flex-1 md:flex-none">Deposit</a>
+          <a href="#/withdraw" class="tab-pill inactive flex-1 md:flex-none">Withdraw</a>
+        </div>
+        <div class="space-y-5 w-full min-w-0">
+          <!-- §1 Payment Methods (PP existing) -->
+          <div>
+            <label class="block text-sm font-semibold text-ink mb-2">Payment Methods</label>
+            <div class="rounded-[14px] p-4 border-2 border-brand-purple bg-white inline-flex items-center gap-3 relative">
+              <span class="text-2xl">📱</span>
+              <span class="font-bold text-ink">QR Ph</span>
+              <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brand-purple text-white text-[10px] flex items-center justify-center">✓</span>
+            </div>
+          </div>
+          <!-- §2 CHOOSE PROMOTION (NEW — 移到 Payment 下方) -->
+          ${promoDropdown}
+          <!-- §3 Deposit Amount (PP existing) -->
+          <div>
+            <label class="block text-sm font-semibold text-ink mb-2">Deposit Amount</label>
+            <div class="grid grid-cols-3 gap-3">${amountChips}</div>
+            <div class="relative mt-3">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted">₱</span>
+              <input id="depositInput" type="number" inputmode="numeric" value="${depositAmount||''}" placeholder="Enter amount (₱${state.minDeposit.toLocaleString()} - ₱${state.maxDeposit.toLocaleString()})" oninput="onDepositInput(this.value)"
+                class="w-full bg-white border ${validationMsg?'border-red-400':'border-softborder'} rounded-full pl-8 pr-4 py-3 text-sm font-medium focus:outline-none focus:border-brand-purple">
+            </div>
+            ${validationMsg ? `<div class="text-xs text-red-500 font-medium mt-1.5 px-1">${validationMsg}</div>` : ''}
+          </div>
+          <!-- §4 SUMMARY -->
+          ${summary}
+          <!-- §5 Submit -->
+          <button class="btn-primary w-full py-3.5 text-base" ${submitEnabled?'':'disabled'} onclick="doDeposit()">${submitLabel}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function togglePromoDropdown() { promoDropdownOpen = !promoDropdownOpen; renderDeposit(); }
+function setDepositAmount(a) { depositAmount = a; renderDeposit(); }
+function onDepositInput(v) { depositAmount = Number(v) || 0; renderDeposit(); }
+function selectPromo(id) { selectedPromoId = id; promoDropdownOpen = false; renderDeposit(); }
+
+function renderDepositSummary() {
+  if (depositAmount < state.minDeposit) return '';
+  const selected = selectedPromoId && selectedPromoId !== 'none' ? getPromo(selectedPromoId) : null;
+  let bonus = 0, target = 0;
+  if (selected) {
+    bonus = selected.bonusFixed !== undefined ? selected.bonusFixed : Math.min(depositAmount*selected.bonusPct/100, selected.bonusCap||Infinity);
+    if (selected.model==='A') target = (depositAmount + bonus) * selected.multiplier;
+    else if (selected.model==='B') target = depositAmount * selected.multiplier;
+    else target = bonus * selected.multiplier;
+  }
+  if (!selected) {
+    return `<div class="info-box space-y-1.5">
+      <div class="font-semibold text-ink mb-1">Summary</div>
+      <div class="flex justify-between text-sm"><span class="text-ink-muted">Deposit</span><span class="font-semibold text-ink">${fmt(depositAmount)}</span></div>
+      <div class="flex justify-between text-sm pt-1.5 border-t border-softborder"><span class="text-ink-muted">Credited to Total Balance</span><span class="font-bold text-ink">${fmt(depositAmount)}</span></div>
+    </div>`;
+  }
+  return `<div class="bg-white rounded-[14px] border-2 border-brand-purple/30 overflow-hidden">
+    <div class="px-4 pt-3 pb-2 space-y-1.5">
+      <div class="font-semibold text-ink mb-1">Summary</div>
+      <div class="flex justify-between text-sm"><span class="text-ink-muted">Deposit</span><span class="font-semibold text-ink">${fmt(depositAmount)}</span></div>
+      <div class="flex justify-between text-sm"><span class="text-ink-muted">Bonus</span><span class="font-semibold text-green-600">+ ${fmt(bonus)}</span></div>
+      <div class="flex justify-between text-sm pt-1.5 border-t border-softborder"><span class="text-ink-muted">Credited to Total Balance</span><span class="font-bold text-ink">${fmt(depositAmount+bonus)}</span></div>
+    </div>
+    <div class="bg-lavender-50 border-t border-softborder px-4 py-3">
+      <div class="flex items-center justify-between"><span class="text-xs text-ink-muted font-semibold">Bet to withdraw</span><span class="font-extrabold text-xl text-brand-purple">${fmtInt(target)}</span></div>
+    </div>
+  </div>`;
+}
+function doDeposit() {
+  const selected = selectedPromoId && selectedPromoId !== 'none' ? getPromo(selectedPromoId) : null;
+  state.balance += depositAmount;
+  if (selected) {
+    const bonus = selected.bonusFixed !== undefined ? selected.bonusFixed : Math.min(depositAmount*selected.bonusPct/100, selected.bonusCap||Infinity);
+    let target = 0;
+    if (selected.model==='A') target = (depositAmount + bonus) * selected.multiplier;
+    else if (selected.model==='B') target = depositAmount * selected.multiplier;
+    else target = bonus * selected.multiplier;
+    const inst = { promoId:selected.id, principal:depositAmount, bonus, target, progress:0 };
+    if (state.activePromo) state.pendingPromos.push(inst); else state.activePromo = inst;
+    state.balance += bonus; state.withdrawable = 0; state.giftUnread = (state.giftUnread||0)+1;
+    toast(`Deposit Successful! ${fmt(depositAmount)} credited.`, '✅');
+    setTimeout(()=> toast(`Bonus ${fmt(bonus)} granted 🎉`, '🎁'), 800);
+  } else {
+    state.depositTurnover.target += depositAmount;
+    if (state.depositTurnover.progress < state.depositTurnover.target) state.withdrawable = 0;
+    else state.withdrawable = state.balance;
+    toast(`Deposit Successful! ${fmt(depositAmount)} credited.`, '✅');
+  }
+  depositAmount = 0; selectedPromoId = 'none';
+  syncAll();
+  setTimeout(()=>{ location.hash = '#/rewards'; toast('Redirecting to lobby...', '🏠', 1500); }, 2500);
+}
+
+/* ============================================= */
+/*  WITHDRAW PAGE (PP 骨架 + 阻擋狀態插入)         */
+/* ============================================= */
+let withdrawAmount = 0;
+function renderWithdraw() {
+  const root = document.getElementById('page-withdraw');
+  let status = 'ok';
+  if (!state.kycPassed) status = 'kyc';
+  else if (state.activePromo) status = 'active';
+  else if (state.depositTurnover.target > state.depositTurnover.progress) status = 'depositTurnover';
+  let validationMsg = '';
+  if (withdrawAmount > 0) {
+    if (withdrawAmount < state.minWithdrawal) validationMsg = `Minimum withdrawal: ${fmtInt(state.minWithdrawal)}`;
+    else if (withdrawAmount > state.withdrawable) validationMsg = `Exceeds your withdrawable amount`;
+  }
+  const canSubmit = status === 'ok' && withdrawAmount >= state.minWithdrawal && !validationMsg && state.withdrawable > 0;
+
+  // Status blocker card (with T&C explanation per Clement #1)
+  let blockerCard = '';
+  if (status === 'kyc') {
+    blockerCard = `<div class="bg-red-50 border border-red-200 rounded-[14px] p-4 flex items-start gap-3">
+      <div class="text-2xl">⚠️</div>
+      <div class="flex-1">
+        <div class="font-bold text-ink mb-1">Complete KYC to withdraw</div>
+        <div class="text-sm text-ink-muted mb-2">Verify your identity before requesting a withdrawal. This protects your account and complies with PH gambling regulations.</div>
+        <button class="btn-primary mt-1" onclick="toast('KYC flow is out of this prototype', 'ℹ️')">Start KYC →</button>
+      </div>
+    </div>`;
+  } else if (status === 'active') {
+    const ap = state.activePromo; const p = getPromo(ap.promoId); const remain = ap.target - ap.progress; const percent = pct(ap.progress, ap.target);
+    blockerCard = `<div class="bg-lavender-50 border-2 border-brand-purple/30 rounded-[14px] p-4">
+      <div class="flex items-center justify-between mb-2"><div class="font-bold text-ink">🎰 Bonus Turnover in progress</div><span class="text-sm text-ink-muted">${percent.toFixed(0)}%</span></div>
+      <div class="text-sm text-ink-muted mb-2">${p?.title || 'Active Promotion'}</div>
+      <div class="h-2 bg-white rounded-full overflow-hidden mb-3"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-3"><div class="text-sm">Bet <strong>${fmtInt(remain)}</strong> more to withdraw</div><a href="#/rewards" class="btn-primary">Play Now →</a></div>
+      <!-- T&C inline explanation -->
+      <div class="pt-3 border-t border-softborder text-xs text-ink-muted leading-relaxed">
+        <div class="font-semibold text-ink mb-1">Why is withdrawal locked?</div>
+        You joined <strong>${p?.title || 'this promotion'}</strong>. Per the promotion terms, you must bet <strong>${fmtInt(ap.target)}</strong> total before withdrawing any funds. Your deposit and bonus stay in your wallet until the turnover is complete.
+        <button class="text-brand-purple font-semibold hover:underline ml-1" onclick="openWithdrawExplainer('active')">Learn more →</button>
+      </div>
+    </div>`;
+  } else if (status === 'depositTurnover') {
+    const dt = state.depositTurnover; const remain = dt.target - dt.progress; const percent = pct(dt.progress, dt.target);
+    blockerCard = `<div class="bg-amber-50 border border-amber-200 rounded-[14px] p-4">
+      <div class="flex items-center justify-between mb-2"><div class="font-bold text-ink">💰 Deposit Turnover</div><span class="text-sm text-ink-muted">${percent.toFixed(0)}%</span></div>
+      <div class="h-2 bg-white rounded-full overflow-hidden mb-3"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-3"><div class="text-sm">Bet <strong>${fmtInt(remain)}</strong> more to withdraw</div><a href="#" class="btn-primary" onclick="toast('Go to lobby','🏠')">Play Now →</a></div>
+      <!-- T&C inline explanation -->
+      <div class="pt-3 border-t border-softborder text-xs text-ink-muted leading-relaxed">
+        <div class="font-semibold text-ink mb-1">Why is withdrawal locked?</div>
+        Our Anti-Money Laundering (AML) policy requires you to bet <strong>1×</strong> the amount of your deposit before withdrawing, to confirm your funds are actively used for play.
+        <button class="text-brand-purple font-semibold hover:underline ml-1" onclick="openWithdrawExplainer('deposit')">Learn more →</button>
+      </div>
+    </div>`;
+  }
+
+  const isBlocked = status !== 'ok';
+  root.innerHTML = `
+    ${pageHeader('Wallet')}
+    <div class="card p-4 md:p-6 mt-4">
+      <div class="flex flex-col md:grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+        <div class="flex flex-row md:flex-col gap-2 w-full md:w-auto">
+          <a href="#/deposit" class="tab-pill inactive flex-1 md:flex-none">Deposit</a>
+          <a href="#/withdraw" class="tab-pill active flex-1 md:flex-none">Withdraw</a>
+        </div>
+        <div class="space-y-5 w-full min-w-0">
+          ${blockerCard}
+          <div class="${isBlocked ? 'opacity-50 pointer-events-none select-none' : ''} space-y-5">
+          <!-- §1 Available Balance (PP) -->
+          <div class="flex items-center gap-2 text-sm">
+            <span class="font-semibold text-ink">Available Balance:</span>
+            <span class="text-ink font-bold">${fmt(state.withdrawable)}</span>
+          </div>
+          <!-- §2 Payment Methods (PP) -->
+          <div>
+            <label class="block text-sm font-semibold text-ink mb-2">Payment Methods</label>
+            <div class="grid grid-cols-2 gap-3 max-w-md">
+              <button class="rounded-[14px] p-4 border-2 border-brand-purple bg-white flex items-center gap-2 relative">
+                <span class="text-2xl">🟦</span><span class="font-bold">GCash</span>
+                <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brand-purple text-white text-[10px] flex items-center justify-center">✓</span>
+              </button>
+              <button class="rounded-[14px] p-4 border border-softborder bg-white flex items-center gap-2 hover:border-brand-purple transition">
+                <span class="text-2xl">🟩</span><span class="font-semibold text-ink-muted">PayMaya</span>
+              </button>
+            </div>
+          </div>
+          <!-- §3 Link Account button (PP) -->
+          <button class="w-full btn-outline py-3" onclick="toast('Account linking out of prototype scope','ℹ️')"><span class="text-brand-purple">+</span> Add account</button>
+          <!-- §4 Amount (PP) -->
+          <div>
+            <label class="block text-sm font-semibold text-ink mb-2">Withdrawal Amount</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted">₱</span>
+              <input id="withdrawInput" type="number" inputmode="decimal" value="${withdrawAmount||''}" placeholder="Enter amount (min ${fmtInt(state.minWithdrawal)})" ${state.withdrawable<=0?'disabled':''} oninput="onWithdrawInput(this.value)"
+                class="w-full bg-white border ${validationMsg?'border-red-400':'border-softborder'} rounded-full pl-8 pr-16 py-3 text-sm font-medium focus:outline-none focus:border-brand-purple disabled:bg-lavender-50 disabled:cursor-not-allowed">
+              <button class="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-lavender-100 text-brand-purple text-xs font-bold hover:bg-lavender-200" ${state.withdrawable<=0?'disabled':''} onclick="setWithdrawAmount(state.withdrawable)">Max</button>
+            </div>
+            ${validationMsg ? `<div class="text-xs text-red-500 font-medium mt-1.5 px-1">${validationMsg}</div>` : ''}
+          </div>
+          </div>
+          <!-- §5 Submit (always rendered outside the disabled wrapper so it stays visible) -->
+          <button class="btn-primary w-full py-3.5 text-base" ${canSubmit?'':'disabled'} onclick="doWithdraw()">
+            ${canSubmit ? 'Submit' : (isBlocked ? '🔒 Locked — Complete the requirements above' : 'Submit')}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function setWithdrawAmount(a) { withdrawAmount = Number(a) || 0; renderWithdraw(); }
+function onWithdrawInput(v) { withdrawAmount = Number(v) || 0; renderWithdraw(); }
+// toggleAvailablePopover removed — Available Balance ⓘ was redundant with blocker card's "Why locked?" explanation
+function faqItem(q, a) {
+  return `<details class="group border-b border-softborder last:border-b-0 py-2.5">
+    <summary class="cursor-pointer list-none flex items-start justify-between gap-3 text-sm font-semibold text-ink hover:text-brand-purple"><span class="flex-1">${q}</span><span class="text-brand-purple shrink-0 mt-0.5 group-open:rotate-180 transition-transform">▼</span></summary>
+    <div class="mt-2 text-xs text-ink-muted leading-relaxed">${a}</div>
+  </details>`;
+}
+
+function openWithdrawExplainer(kind) {
+  if (kind === 'active') {
+    const ap = state.activePromo || {}; const p = getPromo(ap.promoId) || {};
+    const remain = (ap.target||0) - (ap.progress||0);
+    openModal('Why is my withdrawal locked?', `
+      <div class="space-y-4 text-sm">
+        <!-- Short intro (retained) -->
+        <p class="text-ink leading-relaxed">You joined <strong>${p.title || 'this promotion'}</strong>. Per the promotion terms, you must bet <strong class="text-brand-purple">${fmtInt(ap.target||0)}</strong> total before withdrawing any funds. Your deposit and bonus stay in your wallet until the turnover is complete.</p>
+        <!-- Your Status (dynamic) -->
+        <div class="info-box !bg-primary-pill !border-none text-white">
+          <div class="text-[10px] uppercase tracking-wide opacity-80 mb-1">Your Progress</div>
+          <div class="grid grid-cols-3 gap-2 mt-1 text-center">
+            <div><div class="text-[10px] opacity-80">Target</div><div class="font-extrabold text-sm">${fmtInt(ap.target||0)}</div></div>
+            <div><div class="text-[10px] opacity-80">Progress</div><div class="font-extrabold text-sm">${fmtInt(ap.progress||0)}</div></div>
+            <div><div class="text-[10px] opacity-80 text-accent-yellow">Remaining</div><div class="font-extrabold text-sm text-accent-yellow">${fmtInt(remain)}</div></div>
+          </div>
+        </div>
+        <!-- FAQ (secondary, reduce support tickets) -->
+        <div>
+          <div class="font-bold text-ink mb-1 text-sm flex items-center gap-1.5"><span class="text-base">❓</span>Common Questions</div>
+          <div class="text-[11px] text-ink-muted/70 mb-2">Tap a question to expand</div>
+          <div class="border-t border-softborder">
+            ${faqItem(
+              'Why is the turnover so high?',
+              `The turnover multiplier (e.g. 30×) is part of the promotion design: the bigger the bonus, the more turnover is required. It helps us offer generous bonuses sustainably.`
+            )}
+            ${faqItem(
+              'Which games count toward my turnover?',
+              `Most games contribute <strong class="text-ink">100%</strong> (Slots, Fish, Arcade, Egame). Table and Live games typically contribute <strong class="text-ink">10%</strong>. A few specific games may be excluded. Check the promotion T&C for the exact list.`
+            )}
+            ${faqItem(
+              'What happens if my balance runs out?',
+              `If your Total Balance drops below ₱1 during play, the promotion automatically ends (low balance). Your remaining funds stay safe — you can deposit again to start fresh with a new promotion.`
+            )}
+            ${faqItem(
+              'Can I cancel the promotion?',
+              `You cannot cancel by yourself. If you need to stop, contact Support and our team will review your case. Funds may be handled case-by-case.`
+            )}
+            ${faqItem(
+              'What happens after I complete turnover?',
+              `Your promotion is marked <strong class="text-ink">Completed 🎉</strong>, the lock is released, and your full balance becomes withdrawable.`
+            )}
+            ${faqItem(
+              'Do I have other promotions in queue?',
+              state.pendingPromos.length
+                ? `Yes — you have <strong class="text-ink">${state.pendingPromos.length}</strong> promotion${state.pendingPromos.length>1?'s':''} pending. The next one starts automatically after the current one ends.`
+                : `No, you only have this one active promotion. Any new promotion you join while this one is active will queue up automatically.`
+            )}
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn-outline flex-1" onclick="closeModal()">Got it</button>
+          <button class="btn-primary flex-1" onclick="closeModal(); openTnc('${ap.promoId||''}')">Full Terms & Conditions →</button>
+        </div>
+      </div>`);
+  } else {
+    const dt = state.depositTurnover || {target:0,progress:0};
+    const remain = dt.target - dt.progress;
+    openModal('Why is my withdrawal locked?', `
+      <div class="space-y-4 text-sm">
+        <!-- Short intro (retained) -->
+        <p class="text-ink leading-relaxed">Our <strong>Anti-Money Laundering (AML) policy</strong> requires you to bet <strong class="text-brand-purple">1×</strong> the amount of your deposit before withdrawing, to confirm your funds are actively used for play.</p>
+        <!-- Your Status (dynamic) -->
+        <div class="info-box !bg-primary-pill !border-none text-white">
+          <div class="text-[10px] uppercase tracking-wide opacity-80 mb-1">Your Progress</div>
+          <div class="grid grid-cols-3 gap-2 mt-1 text-center">
+            <div><div class="text-[10px] opacity-80">Target</div><div class="font-extrabold text-sm">${fmtInt(dt.target)}</div></div>
+            <div><div class="text-[10px] opacity-80">Progress</div><div class="font-extrabold text-sm">${fmtInt(dt.progress)}</div></div>
+            <div><div class="text-[10px] opacity-80 text-accent-yellow">Remaining</div><div class="font-extrabold text-sm text-accent-yellow">${fmtInt(remain)}</div></div>
+          </div>
+        </div>
+        <!-- FAQ (secondary, reduce support tickets) -->
+        <div>
+          <div class="font-bold text-ink mb-1 text-sm flex items-center gap-1.5"><span class="text-base">❓</span>Common Questions</div>
+          <div class="text-[11px] text-ink-muted/70 mb-2">Tap a question to expand</div>
+          <div class="border-t border-softborder">
+            ${faqItem(
+              'Is this the same as a promotion?',
+              `No. The Deposit Turnover is a <strong class="text-ink">basic AML requirement</strong> for every deposit, regardless of any promotion. It's a flat 1× turnover rule.`
+            )}
+            ${faqItem(
+              'Is my deposit amount the same as the turnover target?',
+              `Yes — your turnover target equals the total of all your deposits since the last reset. Every time you deposit, the target grows; every time you bet (on contributing games), the progress grows.`
+            )}
+            ${faqItem(
+              'Which games count?',
+              `Most games contribute <strong class="text-ink">100%</strong> (Slots, Fish, Arcade, Egame). Table and Live games contribute <strong class="text-ink">10%</strong>. A few specific games are fully excluded — these count <strong class="text-ink">0%</strong> toward turnover.`
+            )}
+            ${faqItem(
+              'What if I deposit again before finishing?',
+              `Your new deposit is added to the turnover target. Example: target is ₱1,000 (progress ₱800); you deposit ₱500 more → new target ₱1,500 (progress ₱800). You need to bet ₱700 more.`
+            )}
+            ${faqItem(
+              'What happens after I complete turnover?',
+              `Your full Total Balance becomes withdrawable immediately. The counter resets to zero after your next successful withdrawal or if your balance runs out.`
+            )}
+          </div>
+        </div>
+        <button class="btn-primary w-full" onclick="closeModal()">Got it</button>
+      </div>`);
+  }
+}
+function doWithdraw() {
+  toast(`Withdrawal requested. ${fmt(withdrawAmount)} will be processed shortly.`, '✅');
+  state.balance -= withdrawAmount; state.withdrawable -= withdrawAmount;
+  state.depositTurnover = { target:0, progress:0 };
+  withdrawAmount = 0; syncAll();
+  setTimeout(()=> location.hash = '#/record', 1500);
+}
+
+/* ============================================= */
+/*  REWARD CENTER                                 */
+/* ============================================= */
+function renderRewards() {
+  const root = document.getElementById('page-rewards');
+
+  // Hero: Active Promotion (if any) > Featured (if none)
+  let heroSection = '';
+  if (state.activePromo) {
+    const ap = state.activePromo; const p = getPromo(ap.promoId); const remain = ap.target-ap.progress; const percent = pct(ap.progress,ap.target);
+    heroSection = `<section>
+      <h2 class="font-bold text-base md:text-lg mb-2 md:mb-3 text-ink">Your Active Promotion</h2>
+      <!-- Hero active card: banner gradient background + white overlay card -->
+      <div class="rounded-[16px] md:rounded-[20px] overflow-hidden shadow-card">
+        <div class="bg-banner-gradient p-4 md:p-5 text-white flex items-center gap-3 md:gap-4">
+          <div class="w-12 h-12 md:w-14 md:h-14 rounded-[12px] bg-white/25 backdrop-blur flex items-center justify-center text-2xl md:text-3xl shrink-0">${p?.icon||'🎁'}</div>
+          <div class="flex-1 min-w-0">
+            <span class="badge bg-white/25 text-white backdrop-blur">${p?.tag||'ACTIVE'}</span>
+            <div class="font-extrabold text-base md:text-xl mt-1 truncate">${p?.title||'Active Promotion'}</div>
+          </div>
+        </div>
+        <div class="bg-white p-4 md:p-5">
+          <div class="flex items-baseline justify-between mb-2"><span class="text-sm font-semibold text-ink">Turnover Progress</span><span class="text-lg font-extrabold text-brand-purple">${percent.toFixed(0)}%</span></div>
+          <div class="h-2.5 bg-lavender-100 rounded-full overflow-hidden mb-2"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div>
+          <div class="text-sm text-ink mb-4">Bet <strong class="text-brand-purple">${fmtInt(remain)}</strong> more to withdraw</div>
+          <div class="flex items-center gap-2"><a href="#" class="btn-primary flex-1" onclick="toast('Go to lobby','🏠')">Play Now →</a><button class="btn-outline whitespace-nowrap" onclick="openTnc('${ap.promoId}')">View T&C</button></div>
+        </div>
+      </div>
+      ${state.pendingPromos.length ? `
+      <div class="mt-3 space-y-2">
+        <div class="text-xs text-ink-muted/70 uppercase font-bold tracking-wide px-1">Up Next</div>
+        ${state.pendingPromos.map((pp,i)=>{
+          const pp2 = getPromo(pp.promoId);
+          return `<div class="card p-3 bg-lavender-50 flex items-center gap-3">
+            <div class="text-xl opacity-60">${pp2?.icon||'🎁'}</div>
+            <div class="flex-1 min-w-0"><div class="font-semibold text-sm text-ink truncate">${pp2?.title}</div><div class="text-[11px] text-ink-muted">Queue #${i+1} · Starts after current</div></div>
+            <button class="text-[11px] text-brand-purple hover:underline font-semibold shrink-0" onclick="openTnc('${pp.promoId}')">T&C</button>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+    </section>`;
+  } else {
+    // Featured (shown when no active)
+    heroSection = `<div class="bg-banner-gradient rounded-[16px] md:rounded-[20px] p-5 md:p-6 lg:p-8 shadow-card text-white relative overflow-hidden">
+      <span class="badge bg-white/25 text-white backdrop-blur mb-2">FEATURED</span>
+      <div class="text-xl md:text-2xl lg:text-3xl font-extrabold mb-1">100% First Deposit Bonus</div>
+      <div class="text-sm opacity-90 mb-3">Up to ₱5,000 · Join and start playing now</div>
+      <button class="btn bg-white text-brand-purple hover:bg-lavender-50" onclick="joinPromo('p1')">Claim Now →</button>
+    </div>`;
+  }
+
+  // Deposit Promotions
+  const promoGrid = `<section>
+    <div class="flex items-center justify-between mb-2 md:mb-3"><h2 class="font-bold text-base md:text-lg text-ink">Deposit Promotions <span class="badge bg-brand-purple/15 text-brand-purple ml-1">${ELIGIBLE_PROMOS.length}</span></h2></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      ${ELIGIBLE_PROMOS.map(p => `
+        <div class="card overflow-hidden card-hover">
+          <div class="aspect-[16/6] md:aspect-[16/7] bg-banner-gradient relative">
+            <span class="absolute top-2.5 left-2.5 md:top-3 md:left-3 badge bg-white text-brand-purple">${p.tag}</span>
+            <div class="absolute bottom-2.5 left-2.5 md:bottom-3 md:left-3 text-3xl md:text-4xl">${p.icon}</div>
+          </div>
+          <div class="p-3 md:p-4 space-y-1.5 md:space-y-2">
+            <div class="font-bold text-ink text-sm md:text-base">${p.title}</div>
+            <div class="text-xs text-ink-muted">${p.subtext}</div>
+            <div class="text-[11px] text-ink-muted/70">${p.period}</div>
+            <div class="pt-2 flex items-center gap-2"><button class="btn-primary flex-1" onclick="joinPromo('${p.id}')">Claim Now</button><button class="btn-outline text-xs whitespace-nowrap" onclick="openTnc('${p.id}')">T&C</button></div>
+          </div>
+        </div>`).join('')}
+    </div></section>`;
+
+  // V2 Coming Soon: simple one-liner at footer
+  const v2Line = `<div class="text-center text-xs text-ink-muted/60 py-2">⏳ Claim Now · VIP · Rakeback · Total Rewards — Coming in V2</div>`;
+
+  root.innerHTML = `
+    ${pageHeader('Reward Center', false)}
+    ${heroSection}
+    ${promoGrid}
+    ${v2Line}
+  `;
+}
+function joinPromo(promoId) { selectedPromoId = promoId; depositAmount = 0; location.hash = '#/deposit'; toast('Promotion preselected. Enter deposit amount.', '🎁', 2500); }
+function openTnc(promoId) {
+  const p = getPromo(promoId); if (!p) return;
+  openModal('Promotion Terms', `
+    <div class="space-y-4">
+      <div><span class="badge bg-brand-purple/15 text-brand-purple">${p.tag}</span><h4 class="font-bold text-lg text-ink mt-1">${p.title}</h4><p class="text-ink-muted text-sm">${p.subtext} · ${p.period}</p></div>
+      <div class="border-t border-softborder pt-3 grid grid-cols-2 gap-2 text-sm">
+        <div class="text-ink-muted/70">Min Deposit</div><div class="text-right font-semibold">${fmtInt(p.minDeposit)}</div>
+        <div class="text-ink-muted/70">Max Deposit</div><div class="text-right font-semibold">${fmtInt(p.maxDeposit)}</div>
+        <div class="text-ink-muted/70">Bonus</div><div class="text-right font-semibold">${p.bonusFixed!==undefined?fmt(p.bonusFixed):`${p.bonusPct}% (max ${fmtInt(p.bonusCap)})`}</div>
+        <div class="text-ink-muted/70">Turnover</div><div class="text-right font-semibold">×${p.multiplier}</div>
+      </div>
+      <div class="border-t border-softborder pt-3"><h5 class="font-semibold mb-2 text-ink">Full Terms & Conditions</h5><p class="text-sm text-ink-muted leading-relaxed">${p.tnc}</p></div>
+    </div>`);
+}
+
+/* ============================================= */
+/*  RECORD — Promotions Tab (PP style)            */
+/* ============================================= */
+let recordTab = 'promotions';
+let recordStatusFilter = 'all';
+let recordDateFrom = '';
+let recordDateTo = '';
+let recordFilterOpen = false;
+let recordPendingStatus = 'all'; // draft state in popover, applied on OK
+
+// Initialize default date range (last 7 days)
+(function initRecordDates(){
+  const today = new Date();
+  const d7 = new Date(today); d7.setDate(d7.getDate() - 6);
+  const fmt = d => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  recordDateTo = fmt(today);
+  recordDateFrom = fmt(d7);
+})();
+
+function renderRecord() {
+  const root = document.getElementById('page-record');
+  const liveRecords = [];
+  if (state.activePromo) {
+    const p = getPromo(state.activePromo.promoId);
+    liveRecords.push({ id:'live-active', promo:p?.title||'Active', tag:p?.tag||'ACTIVE', joined:'2026/04/17 10:00:00', principal:state.activePromo.principal, bonus:state.activePromo.bonus, target:state.activePromo.target, progress:state.activePromo.progress, status:'ACTIVE' });
+  }
+  state.pendingPromos.forEach((pp,i)=>{
+    const p = getPromo(pp.promoId);
+    liveRecords.push({ id:'live-pending-'+i, promo:p?.title||'Pending', tag:p?.tag||'PENDING', joined:'2026/04/17 10:00:00', principal:pp.principal, bonus:pp.bonus, target:pp.target, progress:0, status:'PENDING' });
+  });
+  let all = [...liveRecords, ...SAMPLE_RECORDS];
+  if (recordStatusFilter !== 'all') all = all.filter(r => r.status === recordStatusFilter);
+  const ordr = { ACTIVE:0, PENDING:1, COMPLETED:2, OUT_OF_BALANCE:3, CANCELLED:4 };
+  all.sort((a,b) => ordr[a.status]-ordr[b.status] || b.joined.localeCompare(a.joined));
+
+  // Render record cards (simplified: status-first hierarchy)
+  const cards = all.length ? all.map(r => {
+    const s = STATUS_LABEL[r.status];
+    const percent = pct(r.progress, r.target);
+    let progressBlock = '';
+    if (r.status === 'ACTIVE') {
+      progressBlock = `<div class="mt-2"><div class="flex items-center justify-between text-[11px] text-ink-muted mb-1"><span>Turnover ${percent.toFixed(0)}%</span><span>Bet ${fmtInt(r.target-r.progress)} more</span></div><div class="h-1.5 bg-lavender-100 rounded-full overflow-hidden"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div></div>`;
+    } else if (r.status === 'COMPLETED') {
+      progressBlock = `<div class="text-[11px] text-green-600 font-semibold mt-1.5">Turnover completed ✅</div>`;
+    } else if (r.status === 'PENDING') {
+      progressBlock = `<div class="text-[11px] text-ink-muted mt-1.5">Not started · In queue</div>`;
+    }
+    return `<div class="bg-white rounded-[14px] shadow-card px-4 py-3 border-l-4 ${r.status==='ACTIVE'?'border-brand-purple':r.status==='COMPLETED'?'border-green-500':r.status==='PENDING'?'border-lavender-400':r.status==='OUT_OF_BALANCE'?'border-yellow-500':'border-orange-500'}">
+      <!-- Status badge + title row (primary) -->
+      <div class="flex items-start justify-between gap-3 mb-1">
+        <div class="min-w-0 flex-1">
+          <span class="badge ${s.cls}">${s.text}</span>
+          <div class="font-bold text-ink text-sm mt-1 truncate">${r.promo}</div>
+          <div class="text-[11px] text-ink-muted/70 mt-0.5">${r.tag} · ${r.joined}</div>
+        </div>
+        <!-- Bonus (secondary, right-aligned, smaller) -->
+        <div class="text-right shrink-0">
+          <div class="text-[10px] text-ink-muted uppercase tracking-wide">Bonus</div>
+          <div class="font-bold text-brand-purple">+ ${fmtInt(r.bonus)}</div>
+        </div>
+      </div>
+      ${progressBlock}
+    </div>`;
+  }).join('<div class="h-3"></div>') : `
+    <div class="text-center py-16">
+      <div class="text-5xl mb-3 opacity-50">🎁</div>
+      <div class="text-sm text-ink-muted mb-3">${recordStatusFilter==='all' ? "You haven't joined any promotions yet." : 'No records found for this filter.'}</div>
+      ${recordStatusFilter==='all' ? '<a href="#/rewards" class="btn-primary inline-flex">Browse Rewards →</a>' : '<button class="btn-outline" onclick="recordStatusFilter=&#39;all&#39;; renderRecord()">Clear Filters</button>'}
+    </div>`;
+
+  root.innerHTML = `
+    ${pageHeader('Record Center', false)}
+    <div class="card p-4 md:p-6">
+      <div class="flex flex-col md:grid md:grid-cols-[160px_1fr] gap-4 md:gap-6 items-start">
+        <div class="flex flex-row md:flex-col gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
+          <div class="relative group shrink-0 md:w-full">
+            <button class="tab-pill inactive opacity-60 cursor-not-allowed w-full whitespace-nowrap" disabled>Transactions</button>
+          </div>
+          <div class="relative group shrink-0 md:w-full">
+            <button class="tab-pill inactive opacity-60 cursor-not-allowed w-full whitespace-nowrap" disabled>Game</button>
+          </div>
+          <button class="tab-pill active shrink-0 md:w-full whitespace-nowrap">Promotions</button>
+        </div>
+        <div class="space-y-3 w-full min-w-0">
+          <!-- Date range + Filter (PP style) -->
+          <div class="flex items-center gap-2 flex-wrap relative">
+            <div class="flex items-center gap-2 flex-1 flex-wrap">
+              <div class="relative flex items-center bg-white border border-softborder rounded-full px-3 py-1.5 text-sm">
+                <input type="date" value="${recordDateFrom.replace(/\//g,'-')}" onchange="recordDateFrom=this.value.replace(/-/g,'/'); renderRecord()" class="bg-transparent outline-none w-[120px] text-xs"/>
+              </div>
+              <span class="text-ink-muted text-sm">to</span>
+              <div class="relative flex items-center bg-white border border-softborder rounded-full px-3 py-1.5 text-sm">
+                <input type="date" value="${recordDateTo.replace(/\//g,'-')}" onchange="recordDateTo=this.value.replace(/-/g,'/'); renderRecord()" class="bg-transparent outline-none w-[120px] text-xs"/>
+              </div>
+              <!-- Filter button -->
+              <button class="w-9 h-9 rounded-full ${recordStatusFilter!=='all'?'bg-brand-purple':'bg-lavender-100 hover:bg-lavender-200'} ${recordStatusFilter!=='all'?'text-white':'text-brand-purple'} flex items-center justify-center font-bold relative" onclick="event.stopPropagation(); recordFilterOpen=!recordFilterOpen; recordPendingStatus=recordStatusFilter; renderRecord()" aria-label="Filter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                ${recordStatusFilter!=='all'?'<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-accent-yellow ring-2 ring-white"></span>':''}
+              </button>
+            </div>
+            <div class="ml-auto text-xs text-ink-muted">${all.length} records</div>
+
+            <!-- Filter popover -->
+            ${recordFilterOpen ? `
+            <div class="absolute right-0 top-full mt-2 z-30 w-[320px] max-w-[calc(100vw-2rem)] bg-white border border-softborder rounded-[14px] shadow-cardHover overflow-hidden" onclick="event.stopPropagation()">
+              <div class="p-4 space-y-4">
+                <div>
+                  <div class="text-sm font-semibold text-ink mb-2">Status</div>
+                  <div class="grid grid-cols-3 gap-2">
+                    ${[
+                      ['all','All'],
+                      ['ACTIVE','Active'],
+                      ['PENDING','Pending'],
+                      ['COMPLETED','Completed'],
+                      ['OUT_OF_BALANCE','Ended'],
+                      ['CANCELLED','Cancelled'],
+                    ].map(([v,l])=>`<button class="text-xs py-2 rounded-lg border-2 ${recordPendingStatus===v?'border-brand-purple bg-brand-purple/5 text-brand-purple font-bold':'border-softborder text-ink-muted hover:border-brand-purple'} relative" onclick="recordPendingStatus=&#39;${v}&#39;; renderRecord();">${l}${recordPendingStatus===v?'<span class=\"absolute top-0.5 right-0.5 text-brand-purple text-[10px]\">✓</span>':''}</button>`).join('')}
+                  </div>
+                </div>
+              </div>
+              <div class="bg-lavender-50 px-4 py-3 flex items-center gap-2">
+                <button class="flex-1 py-2 rounded-full bg-white border border-softborder text-ink-muted text-sm font-semibold hover:border-brand-purple" onclick="recordPendingStatus=&#39;all&#39;; renderRecord()">Reset</button>
+                <button class="flex-1 py-2 rounded-full bg-primary-cta text-white text-sm font-bold" onclick="recordStatusFilter=recordPendingStatus; recordFilterOpen=false; renderRecord()">OK</button>
+              </div>
+            </div>` : ''}
+          </div>
+          ${cards}
+        </div>
+      </div>
+      <div class="mt-4 text-[11px] text-ink-muted/70 text-center">Transactions & Game tabs are provided by the existing platform.</div>
+    </div>
+  `;
+  // Close filter popover on outside click
+  if (recordFilterOpen) {
+    setTimeout(() => {
+      document.addEventListener('click', function closer() {
+        if (recordFilterOpen) { recordFilterOpen = false; renderRecord(); }
+      }, { once: true });
+    }, 0);
+  }
+}
+function openRecordDrawer(id) {
+  const live = [];
+  if (state.activePromo) live.push({ id:'live-active', promo:getPromo(state.activePromo.promoId)?.title, tag:getPromo(state.activePromo.promoId)?.tag, joined:'2026/04/17 10:00:00', principal:state.activePromo.principal, bonus:state.activePromo.bonus, target:state.activePromo.target, progress:state.activePromo.progress, status:'ACTIVE' });
+  state.pendingPromos.forEach((pp,i)=>live.push({ id:'live-pending-'+i, promo:getPromo(pp.promoId)?.title, tag:getPromo(pp.promoId)?.tag, joined:'2026/04/17 10:00:00', principal:pp.principal, bonus:pp.bonus, target:pp.target, progress:0, status:'PENDING' }));
+  const all = [...live, ...SAMPLE_RECORDS];
+  const r = all.find(x=>x.id===id); if (!r) return;
+  const s = STATUS_LABEL[r.status]; const percent = pct(r.progress, r.target);
+  const body = `
+    <div class="space-y-4">
+      <div><span class="badge ${s.cls}">${s.text}</span><span class="badge bg-brand-purple/15 text-brand-purple ml-1">${r.tag}</span>
+        <h3 class="font-bold text-lg text-ink mt-2">${r.promo}</h3><div class="text-xs text-ink-muted">Joined: ${r.joined}</div></div>
+      <div class="info-box">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div><div class="text-ink-muted/70 text-xs">Principal</div><div class="font-semibold text-ink">${fmt(r.principal)}</div></div>
+          <div><div class="text-ink-muted/70 text-xs">Bonus</div><div class="font-semibold text-green-600">+ ${fmt(r.bonus)}</div></div>
+          <div><div class="text-ink-muted/70 text-xs">Turnover Target</div><div class="font-semibold text-ink">${fmtInt(r.target)}</div></div>
+          <div><div class="text-ink-muted/70 text-xs">Progress</div><div class="font-semibold text-ink">${fmtInt(r.progress)}</div></div>
+        </div>
+        ${r.status==='ACTIVE' || r.status==='COMPLETED' ? `<div class="mt-3"><div class="h-2 bg-white rounded-full overflow-hidden"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div><div class="text-xs text-ink-muted mt-1">${percent.toFixed(1)}% complete</div></div>` : ''}
+      </div>
+      <div class="border-t border-softborder pt-3">
+        <h5 class="font-semibold mb-1 text-sm text-ink">Calculation</h5>
+        <div class="text-xs text-ink-muted leading-relaxed">Principal ${fmt(r.principal)} + Bonus ${fmt(r.bonus)} × Multiplier = <strong>${fmtInt(r.target)}</strong> turnover target.</div>
+      </div>
+      <div class="border-t border-softborder pt-3">
+        <h5 class="font-semibold mb-1 text-sm text-ink">T&C Snapshot</h5>
+        <p class="text-xs text-ink-muted leading-relaxed">The full terms as agreed on ${r.joined}.</p>
+      </div>
+    </div>`;
+  openDrawer(r.promo, body);
+}
+
+/* ============================================= */
+/*  GIFT BOX DROPDOWN                             */
+/* ============================================= */
+function renderGiftBox() {
+  const box = document.getElementById('giftBoxContent');
+  const ts = getTurnoverStatus();
+  const forYou = ELIGIBLE_PROMOS.slice(0,3);
+  const isEmpty = !state.activePromo && forYou.length === 0;
+
+  // Featured banner — hide when empty state covers it
+  const banner = `<a href="#/rewards" onclick="toggleGiftBox(false)" class="block p-4 bg-banner-gradient text-white">
+    <div class="text-[10px] uppercase opacity-80 mb-1">Featured</div>
+    <div class="font-bold leading-tight">100% First Deposit</div>
+    <div class="text-xs opacity-90 mt-1">Up to ₱5,000 · Claim now →</div>
+  </a>`;
+
+  // Status Block — ONE of three mutually exclusive states (no more duplication)
+  let statusBlock = '';
+  if (state.activePromo) {
+    // State A: Active Promotion (includes all turnover info — no separate Turnover row)
+    const p = getPromo(state.activePromo.promoId);
+    const remain = state.activePromo.target - state.activePromo.progress;
+    const percent = pct(state.activePromo.progress, state.activePromo.target);
+    statusBlock = `<div class="border-b border-softborder">
+      <div class="px-4 py-2 text-[10px] uppercase text-ink-muted/70 font-bold tracking-wide">Your Active Promotion</div>
+      <a href="#/rewards" onclick="toggleGiftBox(false)" class="block px-4 py-3 hover:bg-lavender-50">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl shrink-0">${p?.icon||'🎰'}</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold truncate text-ink">${p?.title||'Active Promotion'}</div>
+          </div>
+          <span class="text-xs font-bold text-brand-purple shrink-0">${percent.toFixed(0)}%</span>
+        </div>
+        <div class="h-2 bg-lavender-100 rounded-full overflow-hidden mt-2 mb-1.5"><div class="h-full progress-bar rounded-full" style="width:${percent}%"></div></div>
+        <div class="text-xs text-ink">Bet <strong class="text-brand-purple">${fmtInt(remain)}</strong> more to withdraw</div>
+      </a>
+      ${state.pendingPromos.length ? `<a href="#/rewards" onclick="toggleGiftBox(false)" class="block px-4 py-2 text-[11px] text-ink-muted/80 hover:bg-lavender-50/50 border-t border-softborder">+ ${state.pendingPromos.length} more pending · View in Rewards →</a>` : ''}
+    </div>`;
+  } else if (ts.type === 'deposit') {
+    // State B: Deposit Turnover only
+    statusBlock = `<div class="px-4 py-3 border-b border-softborder">
+      <div class="flex items-center justify-between mb-1.5"><div class="text-sm font-semibold text-ink">💰 ${ts.label}</div><span class="text-xs text-brand-purple font-bold">${ts.pct.toFixed(0)}%</span></div>
+      <div class="h-2 bg-lavender-100 rounded-full overflow-hidden mb-1.5"><div class="h-full progress-bar rounded-full" style="width:${ts.pct}%"></div></div>
+      <div class="text-xs text-ink">Bet <strong class="text-brand-purple">${fmtInt(ts.remain)}</strong> more to withdraw</div>
+    </div>`;
+  }
+  // State C (Ready to withdraw) — intentionally NOT shown in Gift Box (Clement #1: only show when there's something in progress)
+
+  // For You section
+  const forYouSection = forYou.length ? `<div class="border-b border-softborder">
+    <div class="px-4 py-2 text-[10px] uppercase text-ink-muted/70 font-bold tracking-wide">For You</div>
+    ${forYou.map(p => `<button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-lavender-50 text-left" onclick="joinPromo('${p.id}'); toggleGiftBox(false);">
+      <div class="text-xl">${p.icon}</div>
+      <div class="flex-1 min-w-0"><span class="badge bg-brand-purple/15 text-brand-purple text-[10px]">${p.tag}</span><div class="text-sm font-semibold mt-0.5 truncate text-ink">${p.title}</div></div>
+      <div class="text-xs font-bold text-brand-purple shrink-0">Join Now ›</div></button>`).join('')}
+  </div>` : '';
+
+  const v2 = `<div class="px-4 py-3 opacity-40 text-[11px] text-center text-ink-muted">⏳ Claim Now · VIP · Rakeback — Coming soon (V2)</div>`;
+
+  // Empty state fallback (no active, no eligible)
+  if (isEmpty) {
+    box.innerHTML = banner + statusBlock + `<div class="p-6 text-center"><div class="text-3xl mb-2">🎁</div><div class="text-sm text-ink">No promotions available right now.</div><div class="text-xs text-ink-muted mt-1">Check back soon!</div></div>` + v2;
+    return;
+  }
+  box.innerHTML = banner + statusBlock + forYouSection + v2;
+}
+
+/* ================ INIT ================ */
+setScenario('active');
+if (!location.hash) location.hash = '#/deposit';
+route();
+</script>
+
+</body>
+</html>

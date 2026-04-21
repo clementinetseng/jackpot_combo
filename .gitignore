@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json.lock
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+
+# Environments
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local scratch / AI working files (not to be committed)
+.claude/
+memory-local/
+*.tmp
+
+# Render
+.render/

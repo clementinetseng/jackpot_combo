@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iGaming Backoffice — Prototype</title>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════ */
+:root {
+  /* Colors — Brand */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff3ff;
+  --color-primary-text: #1e40af;
+
+  /* Colors — Semantic */
+  --color-success: #16a34a;
+  --color-success-light: #e8faf0;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-light: #fee2e2;
+  --color-info: #7c3aed;
+  --color-info-light: #f3eeff;
+
+  /* Colors — Neutral */
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-border: #dfe2e8;
+  --color-border-hover: #c0c4cc;
+  --color-text-primary: #1a1d26;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-text-disabled: #c0c4cc;
+  --color-row-alt: #f9fafb;
+  --color-row-hover: #f0f4ff;
+  --color-row-selected: #eef2ff;
+
+  /* Sidebar */
+  --color-sidebar: #1e2433;
+  --color-sidebar-hover: #2d3548;
+  --color-sidebar-active: #3a4560;
+  --color-sidebar-text: #a0a8b8;
+  --color-sidebar-text-active: #ffffff;
+
+  /* Spacing Scale */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 12px;
+  --sp-lg: 16px;
+  --sp-xl: 20px;
+  --sp-2xl: 24px;
+  --sp-3xl: 32px;
+  --sp-4xl: 40px;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 13px;
+  --font-md: 14px;
+  --font-lg: 16px;
+  --font-xl: 18px;
+  --font-2xl: 22px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height: 1.5;
+
+  /* Borders */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  --shadow-overlay: 0 8px 32px rgba(0,0,0,0.18);
+
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --drawer-width: 480px;
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  line-height: var(--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--color-primary); text-decoration: none; cursor: pointer; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; font-size: var(--font-base); }
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════ */
+.app { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-text);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: var(--sp-xl) var(--sp-2xl);
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  color: #fff;
+  letter-spacing: -0.3px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-nav { padding: var(--sp-sm) var(--sp-md); flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-md);
+  padding: var(--sp-sm) var(--sp-lg);
+  border-radius: var(--radius-md);
+  color: var(--color-sidebar-text);
+  font-size: var(--font-base);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--color-sidebar-hover); color: #ddd; text-decoration: none; }
+.nav-item.active { background: var(--color-sidebar-active); color: var(--color-sidebar-text-active); font-weight: var(--font-weight-semibold); }
+.nav-icon { width: 18px; text-align: center; font-size: 14px; opacity: 0.7; }
+.nav-item.active .nav-icon { opacity: 1; }
+
+/* MAIN CONTENT */
+.main { flex: 1; margin-left: var(--sidebar-width); min-height: 100vh; }
+.page-content { padding: var(--sp-2xl) var(--sp-3xl); }
+
+/* ═══════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════ */
+
+/* -- Page Header -- */
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--sp-2xl); }
+.page-title { font-size: var(--font-2xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); }
+.page-desc { font-size: var(--font-base); color: var(--color-text-secondary); margin-top: var(--sp-xs); }
+.back-link { font-size: var(--font-base); color: var(--color-primary); margin-bottom: var(--sp-md); display: inline-block; cursor: pointer; font-weight: var(--font-weight-medium); }
+.back-link:hover { text-decoration: underline; }
+
+/* -- Buttons -- */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--sp-sm);
+  padding: var(--sp-sm) var(--sp-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-success { background: var(--color-success); color: #fff; }
+.btn-danger { background: var(--color-danger); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-outline { background: #fff; border: 1px solid var(--color-border); color: var(--color-text-secondary); }
+.btn-outline:hover { border-color: var(--color-border-hover); color: var(--color-text-primary); }
+.btn-outline-danger { background: #fff; border: 1px solid var(--color-danger); color: var(--color-danger); }
+.btn-outline-danger:hover { background: var(--color-danger-light); }
+.btn-outline-primary { background: #fff; border: 1px solid var(--color-border); color: var(--color-primary); }
+.btn-disabled { background: #f3f4f6; color: var(--color-text-disabled); cursor: not-allowed; border: 1px solid var(--color-border); }
+.btn-sm { padding: var(--sp-xs) var(--sp-md); font-size: var(--font-sm); }
+.btn-lg { padding: var(--sp-md) var(--sp-xl); font-size: var(--font-md); }
+
+/* -- Badge (status pills) -- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.badge-success { background: var(--color-success-light); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-light); color: var(--color-warning); }
+.badge-danger { background: var(--color-danger-light); color: var(--color-danger); }
+.badge-primary { background: var(--color-primary-light); color: var(--color-primary-text); }
+.badge-info { background: var(--color-info-light); color: var(--color-info); }
+.badge-muted { background: #f3f4f6; color: var(--color-text-secondary); }
+
+/* -- Card -- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--sp-xl);
+}
+.card-header {
+  padding: var(--sp-lg) var(--sp-2xl);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
+.card-body { padding: var(--sp-2xl); }
+
+/* -- Form Controls -- */
+.form-group { margin-bottom: var(--sp-xl); }
+.form-label { display: block; font-size: var(--font-sm); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); margin-bottom: var(--sp-sm); }
+.form-label .required { color: var(--color-danger); }
+.form-input, .form-select {
+  width: 100%;
+  padding: var(--sp-sm) var(--sp-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  background: #fff;
+  transition: border-color var(--transition-fast);
+  color: var(--color-text-primary);
+}
+.form-input:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.form-input::placeholder { color: var(--color-text-muted); }
+.form-input-disabled { background: #f9fafb; color: var(--color-text-muted); cursor: not-allowed; }
+.form-row { display: grid; gap: var(--sp-lg); }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-hint { font-size: var(--font-xs); color: var(--color-text-muted); margin-top: var(--sp-xs); }
+
+/* -- Toggle Switch -- */
+.toggle { position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer; }
+.toggle input { display: none; }
+.toggle-slider {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.toggle input:checked + .toggle-slider { background: var(--color-success); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* -- Table -- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left;
+  padding: var(--sp-sm) var(--sp-md);
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  background: #f8f9fb;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+tbody td {
+  padding: var(--sp-sm) var(--sp-md);
+  font-size: var(--font-sm);
+  border-bottom: 1px solid #f0f1f3;
+  vertical-align: middle;
+}
+tbody tr:hover { background: var(--color-row-hover); }
+tbody tr.selected { background: var(--color-row-selected); border-left: 3px solid var(--color-primary); }
+.table-actions { display: flex; gap: var(--sp-sm); align-items: center; }
+.action-icon {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-size: 15px;
+}
+.action-icon:hover { background: #f0f1f3; }
+.action-icon.danger:hover { background: var(--color-danger-light); }
+.cell-link { color: var(--color-primary); font-weight: var(--font-weight-medium); cursor: pointer; }
+.cell-muted { color: var(--color-text-muted); }
+.checkbox { width: 15px; height: 15px; cursor: pointer; accent-color: var(--color-primary); }
+
+/* -- Filter Bar -- */
+.filter-bar { display: flex; gap: var(--sp-sm); margin-bottom: var(--sp-xl); flex-wrap: wrap; align-items: center; }
+.filter-bar .form-input, .filter-bar .form-select { width: auto; min-width: 140px; font-size: var(--font-sm); padding: 6px 10px; }
+
+/* -- Pagination -- */
+.pagination { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-lg) var(--sp-md); font-size: var(--font-sm); color: var(--color-text-secondary); }
+.pagination-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  font-size: var(--font-sm); cursor: pointer;
+  background: #fff; color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+.page-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.page-btn.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+/* -- Stepper -- */
+.stepper { display: flex; align-items: flex-start; justify-content: center; padding: var(--sp-xl) 0; margin-bottom: var(--sp-2xl); }
+.step { display: flex; flex-direction: column; align-items: center; position: relative; min-width: 140px; }
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--font-sm); font-weight: var(--font-weight-semibold);
+  color: #fff; margin-bottom: var(--sp-sm);
+  position: relative; z-index: 1;
+}
+.step-circle.completed { background: var(--color-success); }
+.step-circle.current { background: var(--color-primary); }
+.step-circle.future { background: var(--color-border); color: var(--color-text-secondary); }
+.step-label { font-size: var(--font-sm); color: var(--color-text-secondary); white-space: nowrap; }
+.step-label.current { color: var(--color-primary); font-weight: var(--font-weight-semibold); }
+.step-label.completed { color: var(--color-success); }
+.step-connector {
+  position: absolute; top: 16px; left: calc(50% + 20px);
+  width: calc(100% - 40px);
+  height: 2px; background: var(--color-border);
+}
+.step-connector.completed { background: var(--color-success); }
+
+/* -- Bottom Action Bar -- */
+.bottom-bar {
+  position: sticky; bottom: 0;
+  background: #fff;
+  border-top: 1px solid var(--color-border);
+  padding: var(--sp-md) var(--sp-3xl);
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 50;
+}
+.bottom-bar-right { display: flex; gap: var(--sp-sm); }
+
+/* -- Drawer (right slide-in) -- */
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: var(--drawer-width);
+  background: #fff;
+  box-shadow: var(--shadow-overlay);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+  overflow-y: auto;
+}
+.drawer-overlay.open .drawer { transform: translateX(0); }
+.drawer-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--sp-xl) var(--sp-2xl);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky; top: 0; background: #fff; z-index: 1;
+}
+.drawer-title { font-size: 17px; font-weight: var(--font-weight-bold); }
+.drawer-close {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 16px; color: var(--color-text-secondary);
+}
+.drawer-close:hover { background: #f0f1f3; }
+.drawer-section {
+  border-bottom: 1px solid var(--color-border);
+}
+.drawer-section-header {
+  padding: var(--sp-sm) var(--sp-2xl);
+  background: #f8f9fb;
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.drawer-section-header.danger { background: #fef2f2; color: var(--color-danger); }
+.drawer-section-body { padding: var(--sp-lg) var(--sp-2xl); }
+.detail-row { display: flex; padding: 5px 0; font-size: var(--font-sm); }
+.detail-label { width: 190px; flex-shrink: 0; color: var(--color-text-secondary); }
+.detail-value { font-weight: var(--font-weight-medium); }
+.drawer-footer {
+  padding: var(--sp-lg) var(--sp-2xl);
+  border-top: 1px solid var(--color-border);
+  position: sticky; bottom: 0; background: #fff;
+}
+
+/* Progress bar */
+.progress-bar { background: #e5e7eb; border-radius: var(--radius-full); height: 8px; margin-top: var(--sp-md); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: var(--radius-full); transition: width var(--transition-slow); }
+
+/* -- Modal -- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-overlay);
+  width: 520px; max-width: 90vw;
+  max-height: 90vh; overflow-y: auto;
+  transform: scale(0.95);
+  transition: transform var(--transition-normal);
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--sp-xl) var(--sp-2xl);
+  border-bottom: 1px solid var(--color-border);
+}
+.modal-header h3 { font-size: var(--font-lg); font-weight: var(--font-weight-bold); }
+.modal-body { padding: var(--sp-2xl); }
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: var(--sp-sm);
+  padding: var(--sp-lg) var(--sp-2xl);
+  border-top: 1px solid var(--color-border);
+}
+.alert-box { padding: var(--sp-md) var(--sp-lg); border-radius: var(--radius-lg); margin-bottom: var(--sp-xl); font-size: var(--font-sm); line-height: 1.6; }
+.alert-warning { background: var(--color-warning-light); }
+.alert-info { background: var(--color-primary-light); }
+.alert-danger { background: var(--color-danger-light); }
+
+/* -- Rich Text Toolbar -- */
+.editor-toolbar {
+  display: flex; gap: 2px; padding: var(--sp-sm);
+  background: #f8f9fb; border: 1px solid var(--color-border);
+  border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.toolbar-btn {
+  width: 30px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); font-size: var(--font-sm); font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary); cursor: pointer;
+}
+.toolbar-btn:hover { background: #e8eaee; }
+.editor-body {
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  min-height: 180px; padding: var(--sp-lg);
+  font-size: var(--font-sm); line-height: 1.7;
+}
+
+/* -- Preview Card -- */
+.preview-section { margin-bottom: var(--sp-xl); }
+.preview-label { font-size: var(--font-xs); font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); margin-bottom: var(--sp-sm); text-transform: uppercase; letter-spacing: 0.05em; }
+.preview-card {
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  padding: var(--sp-lg); background: #f9fafb;
+}
+
+/* -- Trigger Condition Row -- */
+.condition-row {
+  display: flex; align-items: center; gap: var(--sp-lg);
+  padding: var(--sp-lg) 0;
+  border-bottom: 1px solid #f0f1f3;
+}
+.condition-row:last-child { border-bottom: none; }
+.condition-info { flex: 1; }
+.condition-id { font-size: var(--font-xs); font-weight: var(--font-weight-bold); color: var(--color-primary); margin-right: var(--sp-sm); }
+.condition-name { font-weight: var(--font-weight-semibold); }
+.condition-name.off { color: var(--color-text-secondary); font-weight: var(--font-weight-normal); }
+.condition-desc { font-size: var(--font-xs); color: var(--color-text-muted); margin-top: 2px; }
+.condition-input { width: 100px; }
+
+/* -- Radio Group -- */
+.radio-group { display: flex; gap: var(--sp-xl); flex-wrap: wrap; }
+.radio-item { display: flex; align-items: center; gap: var(--sp-sm); cursor: pointer; font-size: var(--font-base); }
+.radio-item input[type="radio"] { accent-color: var(--color-primary); }
+
+/* Utility */
+.hidden { display: none !important; }
+.text-muted { color: var(--color-text-muted); }
+.text-danger { color: var(--color-danger); }
+.text-sm { font-size: var(--font-sm); }
+.text-xs { font-size: var(--font-xs); }
+.mt-sm { margin-top: var(--sp-sm); }
+.mt-md { margin-top: var(--sp-md); }
+.mt-lg { margin-top: var(--sp-lg); }
+.mb-md { margin-bottom: var(--sp-md); }
+.mb-lg { margin-bottom: var(--sp-lg); }
+.gap-sm { gap: var(--sp-sm); }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
+
+/* Two-column layout for Step 4 */
+.two-col { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--sp-2xl); }
+
+/* Contribution tabs */
+.contrib-tabs { display: flex; gap: var(--sp-sm); margin-bottom: var(--sp-lg); }
+.contrib-tab {
+  padding: var(--sp-sm) var(--sp-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm); font-weight: var(--font-weight-medium);
+  cursor: pointer; border: 1px solid var(--color-border);
+  background: #fff; color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+.contrib-tab.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.contrib-tab:hover:not(.active) { border-color: var(--color-border-hover); }
+
+/* Toast notification */
+.toast-container { position: fixed; top: var(--sp-2xl); right: var(--sp-2xl); z-index: 9999; display: flex; flex-direction: column; gap: var(--sp-sm); }
+.toast { display: flex; align-items: center; gap: var(--sp-md); padding: var(--sp-md) var(--sp-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); font-size: var(--font-md); color: var(--color-text-primary); min-width: 280px; transform: translateX(120%); opacity: 0; transition: transform var(--transition-normal), opacity var(--transition-normal); }
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast.toast-success { border-left: 4px solid var(--color-success); }
+.toast.toast-error { border-left: 4px solid var(--color-danger); }
+.toast.toast-info { border-left: 4px solid var(--color-primary); }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast-body { flex: 1; }
+.toast-title { font-weight: var(--font-weight-semibold); margin-bottom: 2px; }
+.toast-msg { font-size: var(--font-sm); color: var(--color-text-secondary); }
+.toast-close { background: none; border: none; cursor: pointer; color: var(--color-text-muted); font-size: 16px; padding: 2px; }
+.toast-close:hover { color: var(--color-text-primary); }
+</style>
+</head>
+<body>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<div class="app">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">☰ iGaming Backoffice</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+      <a class="nav-item" data-page="transactions"><span class="nav-icon">💳</span> Transactions</a>
+      <a class="nav-item" data-page="players"><span class="nav-icon">👥</span> Players</a>
+      <a class="nav-item active" data-page="promo-list"><span class="nav-icon">🎯</span> Promotions</a>
+      <a class="nav-item" data-page="reward-list"><span class="nav-icon">🎁</span> Reward History</a>
+      <a class="nav-item" data-page="reports"><span class="nav-icon">📈</span> Reports</a>
+      <a class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+  </aside>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main">
+
+    <!-- ═══════════════════════════════════════
+         PAGE: PROMOTION LIST
+         ═══════════════════════════════════════ -->
+    <div id="page-promo-list" class="page-content">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Promotion Management</div>
+          <div class="page-desc">Manage promotion settings: search, filter, view, duplicate, edit, enable/disable</div>
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="goToWizard(1,'create')">+ Create Promotion</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <select class="form-select" style="width:150px"><option>promotion_id</option><option>promotion_name</option></select>
+        <input class="form-input" style="width:200px" placeholder="🔍 Search...">
+        <select class="form-select"><option>Promotion Type: All</option><option>Deposit Bonus</option></select>
+        <select class="form-select"><option>Status: All</option><option>Enabled</option><option>Disabled</option></select>
+        <input class="form-input" type="date" style="width:160px" title="Start From">
+        <input class="form-input" type="date" style="width:160px" title="End Before">
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Promotion ID</th><th>Promotion Name</th><th>Type</th><th>Period</th>
+                <th>Bonus Cost</th><th>Claims / Participants</th><th>Status</th>
+                <th>Created By</th><th>Remark</th><th>Last Updated</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="promo-table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span>Showing 1-5 of 5 results · Default sort: Last Updated DESC · 20 per page</span>
+          <div class="pagination-btns">
+            <span class="page-btn">‹</span><span class="page-btn active">1</span><span class="page-btn">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         PAGE: WIZARD (Steps 1-4)
+         ═══════════════════════════════════════ -->
+    <div id="page-wizard" class="page-content hidden">
+      <div class="back-link" onclick="showPage('promo-list')">← Back to Promotion Management</div>
+      <div class="page-title" id="wizard-page-title">Create Promotion</div>
+      <div class="page-desc">Complete the following steps to set up your promotion</div>
+
+      <!-- Stepper -->
+      <div class="stepper" id="wizard-stepper"></div>
+
+      <!-- Step title -->
+      <div style="margin-bottom: var(--sp-xl);">
+        <div style="font-size:17px;font-weight:var(--font-weight-semibold)" id="step-title"></div>
+        <div class="text-sm text-muted mt-sm" id="step-desc"></div>
+      </div>
+
+      <!-- Step content containers -->
+      <div id="step-1-content" class="hidden"></div>
+      <div id="step-2-content" class="hidden"></div>
+      <div id="step-3-content" class="hidden"></div>
+      <div id="step-4-content" class="hidden"></div>
+
+      <!-- Bottom bar -->
+      <div class="bottom-bar">
+        <button class="btn btn-outline" onclick="confirmLeaveWizard()">Cancel</button>
+        <div class="bottom-bar-right">
+          <button class="btn btn-outline" id="btn-back" onclick="wizardBack()">← Back</button>
+          <button class="btn btn-outline-primary" onclick="wizardSave()">Save</button>
+          <button class="btn btn-primary" id="btn-next" onclick="wizardNext()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         PAGE: REWARD HISTORY LIST
+         ═══════════════════════════════════════ -->
+    <div id="page-reward-list" class="page-content hidden">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Reward History</div>
+          <div class="page-desc">View and manage all player reward records</div>
+        </div>
+        <div class="flex gap-sm">
+          <button class="btn btn-disabled btn-sm" id="batch-cancel-btn" onclick="batchCancel()">🚫 Batch Cancel (<span id="batch-count">0</span>)</button>
+          <button class="btn btn-outline btn-sm">📥 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <select class="form-select" style="width:140px"><option>reward_id</option><option>player_id</option><option>username</option><option>promotion_id</option></select>
+        <input class="form-input" style="width:200px" placeholder="🔍 Search...">
+        <select class="form-select"><option>Reward Type</option><option>Deposit Bonus</option><option>KYC Bonus</option><option>Cashback</option><option>VIP Daily</option><option>VIP LevelUp</option></select>
+        <select class="form-select"><option>Reward Status</option><option>CLAIMABLE</option><option>GRANTED</option><option>EXPIRED</option><option>REVOKED</option></select>
+        <select class="form-select" style="min-width:170px"><option>Bonus Turnover Status</option><option>PENDING</option><option>ACTIVE</option><option>COMPLETED</option><option>OUT_OF_BALANCE</option><option>CANCELLED</option></select>
+        <input class="form-input" type="date" style="width:150px" title="Granted At">
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:30px"><input type="checkbox" class="checkbox" onchange="toggleAllRewardChecks(this)"></th>
+                <th>Reward ID</th><th>Promotion ID</th><th>Player ID</th><th>Username</th>
+                <th>Reward Type</th><th>Reward Status</th><th>Bonus Turnover Status</th>
+                <th>Reward Amount</th><th>Progress / Target</th>
+                <th>Granted At</th><th>Ended At</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reward-table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span>Showing 1-8 of 156 results · Default sort: Granted At DESC</span>
+          <div class="pagination-btns">
+            <span class="page-btn">‹</span><span class="page-btn active">1</span><span class="page-btn">2</span><span class="page-btn">3</span><span class="page-btn">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ DRAWER: Reward Detail ═══ -->
+<div class="drawer-overlay" id="reward-drawer">
+  <div class="drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Reward Detail</span>
+      <span class="drawer-close" onclick="closeDrawer()">✕</span>
+    </div>
+    <div id="drawer-content"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Cancel Confirmation ═══ -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⚠️ Cancel Bonus Turnover</h3>
+      <span class="drawer-close" onclick="closeModal('cancel-modal')">✕</span>
+    </div>
+    <div class="modal-body">
+      <div class="alert-box alert-warning" id="cancel-alert-text"></div>
+      <div class="form-group">
+        <label class="form-label">Cancel Reason <span class="required">*</span></label>
+        <select class="form-select" id="cancel-reason-select">
+          <option value="">Select a reason...</option>
+          <option>Promotion Misconfigured</option>
+          <option>Player Request</option>
+          <option>Operational Adjustment</option>
+          <option>Fraud / Abuse</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Remark <span class="required">*</span> <span class="text-muted">(min. 2 chars)</span></label>
+        <textarea class="form-input" id="cancel-remark-input" rows="3" placeholder="Enter reason for cancellation..."></textarea>
+        <div class="form-hint text-danger hidden" id="cancel-remark-error">⚠ Remark must be at least 2 characters.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('cancel-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmCancelReward()">Confirm Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Confirm Deactivation ═══ -->
+<div class="modal-overlay" id="deactivate-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⚠️ Confirm Deactivation</h3>
+      <span class="drawer-close" onclick="closeModal('deactivate-modal')">✕</span>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:var(--sp-lg)">Are you sure you want to deactivate <strong id="deactivate-name"></strong>?</p>
+      <div class="alert-box alert-warning">
+        <strong>Impact:</strong><br>
+        • Immediate stop for new player participation<br>
+        • Prevent creation of new promotion instances<br>
+        • Existing active instances will NOT be affected
+      </div>
+      <div class="form-group">
+        <label class="form-label">Remark <span class="required">*</span> <span class="text-muted">(min. 2 chars)</span></label>
+        <textarea class="form-input" rows="3" placeholder="Explain why this promotion is being disabled..."></textarea>
+      </div>
+      <div class="alert-box alert-info">
+        <strong>ℹ️ Notice:</strong> Disabling does NOT terminate active player instances. To cancel specific player bonus turnover, please use the Reward History page.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deactivate-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeactivate()">Confirm Disable</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Unsaved Changes ═══ -->
+<div class="modal-overlay" id="unsaved-modal">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>⚠️ Unsaved Changes</h3>
+      <span class="drawer-close" onclick="closeModal('unsaved-modal')">✕</span>
+    </div>
+    <div class="modal-body">
+      <p>You have unsaved changes. Are you sure you want to leave this page?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-primary" onclick="closeModal('unsaved-modal')">Stay</button>
+      <button class="btn btn-danger" onclick="closeModal('unsaved-modal');showPage('promo-list')">Leave</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════ */
+const promotions = [
+  {id:"PRM-20260408-0001",name:"100% First Deposit Bonus",type:"Deposit Bonus",period:"2026-04-08 ~ Long-term",cost:"₱125,000",claims:"250 / 180",status:"Enabled",by:"admin_john",remark:"Q2 campaign",updated:"2026-04-16 18:00:00"},
+  {id:"PRM-20260408-0002",name:"50% Reload Bonus",type:"Deposit Bonus",period:"2026-04-08 ~ 2026-05-08",cost:"₱42,000",claims:"84 / 60",status:"Enabled",by:"admin_sarah",remark:"Monthly promo",updated:"2026-04-15 10:30:00"},
+  {id:"PRM-20260408-0003",name:"Weekend Special",type:"Deposit Bonus",period:"2026-04-12 ~ 2026-04-14",cost:"₱8,500",claims:"17 / 15",status:"Disabled",by:"admin_john",remark:"Ended early",updated:"2026-04-14 23:00:00"},
+  {id:"PRM-20260408-0004",name:"VIP Exclusive 80%",type:"Deposit Bonus",period:"2026-04-10 ~ Long-term",cost:"₱320,000",claims:"400 / 95",status:"Enabled",by:"admin_sarah",remark:"VIP only",updated:"2026-04-16 09:15:00"},
+  {id:"PRM-20260408-0005",name:"New Player Welcome",type:"Deposit Bonus",period:"2026-04-01 ~ Long-term",cost:"₱67,000",claims:"134 / 134",status:"Disabled",by:"admin_john",remark:"Replaced by 0001",updated:"2026-04-08 12:00:00"},
+];
+
+const rewards = [
+  {rid:"RW-0421",pid:"PRM-20260408-0001",plid:"PH-98123",uname:"Maria Santos",rtype:"Deposit Bonus",rs:"GRANTED",ts:"ACTIVE",amt:"₱500",prog:"₱12,500 / ₱45,000",gAt:"2026-04-21 14:30:00",eAt:"—",canCheck:true,
+   detail:{model:"Principal + Bonus (A)",mult:"30x",principal:"₱1,000",bonus:"₱500",target:"₱45,000",progress:"₱12,500",remaining:"₱32,500",exclRebate:"No",grantMethod:"Auto-Credited",rewardName:"100% First Deposit Bonus",cashbackPct:"—",pct:27.8}},
+  {rid:"RW-0420",pid:"PRM-20260408-0001",plid:"PH-98123",uname:"Maria Santos",rtype:"Deposit Bonus",rs:"GRANTED",ts:"PENDING",amt:"₱300",prog:"₱0 / ₱27,000",gAt:"2026-04-20 10:15:00",eAt:"—",canCheck:true,
+   detail:{model:"Principal + Bonus (A)",mult:"30x",principal:"₱600",bonus:"₱300",target:"₱27,000",progress:"₱0",remaining:"₱27,000",exclRebate:"No",grantMethod:"Auto-Credited",rewardName:"100% First Deposit Bonus",cashbackPct:"—",pct:0}},
+  {rid:"RW-0419",pid:"PRM-20260408-0002",plid:"PH-55012",uname:"Juan Reyes",rtype:"KYC Bonus",rs:"GRANTED",ts:"—",amt:"₱100",prog:"—",gAt:"2026-04-19 08:00:00",eAt:"—",canCheck:false,
+   detail:{grantMethod:"Auto-Credited",rewardName:"KYC Verification Bonus",cashbackPct:"—"}},
+  {rid:"RW-0418",pid:"—",plid:"PH-33201",uname:"Ana Cruz",rtype:"Cashback",rs:"GRANTED",ts:"—",amt:"₱250",prog:"—",gAt:"2026-04-18 12:00:00",eAt:"—",canCheck:false,
+   detail:{grantMethod:"Auto-Credited",rewardName:"VIP Weekly Cashback",cashbackPct:"5%"}},
+  {rid:"RW-0417",pid:"PRM-20260408-0001",plid:"PH-98123",uname:"Maria Santos",rtype:"Deposit Bonus",rs:"GRANTED",ts:"COMPLETED",amt:"₱1,000",prog:"₱60,000 / ₱60,000",gAt:"2026-04-17 09:45:00",eAt:"2026-04-20 18:30:00",canCheck:false,
+   detail:{model:"Principal + Bonus (A)",mult:"30x",principal:"₱2,000",bonus:"₱1,000",target:"₱60,000",progress:"₱60,000",remaining:"₱0",exclRebate:"No",grantMethod:"Auto-Credited",rewardName:"100% First Deposit Bonus",cashbackPct:"—",pct:100}},
+  {rid:"RW-0416",pid:"PRM-20260408-0003",plid:"PH-44001",uname:"Pedro Lim",rtype:"Deposit Bonus",rs:"EXPIRED",ts:"—",amt:"₱200",prog:"—",gAt:"2026-04-16 15:20:00",eAt:"2026-04-17 15:20:00",canCheck:false,
+   detail:{grantMethod:"Claimable",rewardName:"Weekend Special",cashbackPct:"—"}},
+  {rid:"RW-0415",pid:"—",plid:"PH-55012",uname:"Juan Reyes",rtype:"VIP Daily",rs:"CLAIMABLE",ts:"—",amt:"₱50",prog:"—",gAt:"2026-04-15 00:00:00",eAt:"—",canCheck:false,
+   detail:{grantMethod:"Claimable",rewardName:"VIP Daily Login Reward",cashbackPct:"—"}},
+  {rid:"RW-0414",pid:"PRM-20260408-0003",plid:"PH-33201",uname:"Ana Cruz",rtype:"Deposit Bonus",rs:"GRANTED",ts:"CANCELLED",amt:"₱500",prog:"₱18,200 / ₱45,000",gAt:"2026-04-14 09:15:00",eAt:"2026-04-15 16:42:00",canCheck:false,
+   detail:{model:"Principal + Bonus (A)",mult:"30x",principal:"₱1,000",bonus:"₱500",target:"₱45,000",progress:"₱18,200",remaining:"₱26,800",exclRebate:"No",grantMethod:"Auto-Credited",rewardName:"50% Reload Bonus",cashbackPct:"—",pct:40.4,
+   cancel:{reason:"Fraud / Abuse",remark:"Multiple accounts detected",operator:"admin_sarah",cancelledAt:"2026-04-15 16:42:00"}}},
+];
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+function showPage(pageId) {
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+  const el = document.getElementById('page-' + pageId);
+  if (el) el.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = {'promo-list':'promo-list','wizard':'promo-list','reward-list':'reward-list'};
+  const navKey = navMap[pageId] || pageId;
+  document.querySelectorAll('.nav-item').forEach(n => { if(n.dataset.page === navKey) n.classList.add('active'); });
+}
+
+document.querySelectorAll('.nav-item').forEach(n => {
+  n.addEventListener('click', () => {
+    const page = n.dataset.page;
+    if (page === 'promo-list' || page === 'reward-list') showPage(page);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   PROMOTION LIST TABLE
+   ═══════════════════════════════════════════ */
+function renderPromoTable() {
+  const tbody = document.getElementById('promo-table-body');
+  tbody.innerHTML = promotions.map((p, i) => {
+    const isEnabled = p.status === 'Enabled';
+    return `<tr>
+      <td class="cell-link">${p.id}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td>${p.type}</td>
+      <td class="text-sm text-muted">${p.period}</td>
+      <td style="font-weight:500">${p.cost}</td>
+      <td>${p.claims}</td>
+      <td>
+        <label class="toggle" onclick="event.stopPropagation();togglePromoStatus(${i})">
+          <input type="checkbox" ${isEnabled?'checked':''}>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="text-xs" style="margin-left:6px;color:${isEnabled?'var(--color-success)':'var(--color-text-muted)'}">${p.status}</span>
+      </td>
+      <td class="text-sm">${p.by}</td>
+      <td class="text-sm text-muted">${p.remark}</td>
+      <td class="text-xs text-muted">${p.updated}</td>
+      <td>
+        <div class="table-actions">
+          <span class="action-icon" title="View" onclick="goToWizard(1,'view')">👁</span>
+          <span class="action-icon" title="Duplicate" onclick="duplicatePromo(${i})">📋</span>
+          ${!isEnabled ? '<span class="action-icon" title="Edit" onclick="goToWizard(1,\'edit\')">✏️</span>' : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+let pendingDeactivateIdx = null;
+function togglePromoStatus(idx) {
+  const p = promotions[idx];
+  if (p.status === 'Enabled') {
+    pendingDeactivateIdx = idx;
+    document.getElementById('deactivate-name').textContent = `"${p.name}"`;
+    openModal('deactivate-modal');
+  } else {
+    p.status = 'Enabled';
+    renderPromoTable();
+  }
+}
+function confirmDeactivate() {
+  if (pendingDeactivateIdx !== null) {
+    promotions[pendingDeactivateIdx].status = 'Disabled';
+    pendingDeactivateIdx = null;
+    renderPromoTable();
+  }
+  closeModal('deactivate-modal');
+}
+function duplicatePromo(idx) {
+  const orig = promotions[idx];
+  const dup = Object.assign({}, orig);
+  const nextId = 'PRM-' + Date.now().toString().slice(-8) + '-DUP';
+  dup.id = nextId;
+  dup.name = orig.name + ' (Copy)';
+  dup.status = 'Disabled';
+  dup.remark = 'Duplicated from ' + orig.id;
+  promotions.push(dup);
+  renderPromoTable();
+}
+function toggleAllRewardChecks(master) {
+  document.querySelectorAll('.reward-check').forEach(c => { c.checked = master.checked; });
+  updateBatchCount();
+}
+function updateBatchCount() {
+  const count = document.querySelectorAll('.reward-check:checked').length;
+  document.getElementById('batch-count').textContent = count;
+  const btn = document.getElementById('batch-cancel-btn');
+  btn.classList.toggle('btn-disabled', count === 0);
+  btn.classList.toggle('btn-outline-danger', count > 0);
+}
+function batchCancel() {
+  const count = document.querySelectorAll('.reward-check:checked').length;
+  if (count === 0) return;
+  openCancelModal('BATCH');
+}
+
+/* ═══════════════════════════════════════════
+   WIZARD
+   ═══════════════════════════════════════════ */
+let currentStep = 1;
+const stepInfo = [
+  {title:'Step 1: Basic Setup', desc:'Define the basic information and timeline for this promotion'},
+  {title:'Step 2: Condition', desc:'Define eligibility criteria and player scope for this promotion'},
+  {title:'Step 3: Reward & Turnover', desc:'Configure bonus rewards, bonus turnover, and game contribution rates'},
+  {title:'Step 4: Info / Announcement', desc:'Customize promotion appearance and detailed terms'},
+];
+const stepLabels = ['Basic Setup','Condition','Reward & Turnover','Info / Announcement'];
+
+let wizardMode = 'create'; // 'create' | 'edit' | 'view'
+function goToWizard(step, mode) {
+  wizardMode = mode || 'create';
+  currentStep = step;
+  showPage('wizard');
+  renderWizardStep();
+}
+
+function renderStepper() {
+  const container = document.getElementById('wizard-stepper');
+  container.innerHTML = stepLabels.map((label, i) => {
+    const idx = i + 1;
+    let circleClass = 'future', labelClass = '';
+    if (idx < currentStep) { circleClass = 'completed'; labelClass = 'completed'; }
+    else if (idx === currentStep) { circleClass = 'current'; labelClass = 'current'; }
+    const connector = i < stepLabels.length - 1
+      ? `<div class="step-connector ${idx < currentStep ? 'completed' : ''}"></div>` : '';
+    return `<div class="step" style="flex:1;">
+      <div class="step-circle ${circleClass}">${idx < currentStep ? '✓' : idx}</div>
+      <div class="step-label ${labelClass}">${label}</div>
+      ${connector}
+    </div>`;
+  }).join('');
+}
+
+function renderWizardStep() {
+  renderStepper();
+  const info = stepInfo[currentStep - 1];
+  document.getElementById('step-title').textContent = info.title;
+  document.getElementById('step-desc').textContent = info.desc;
+  for (let i = 1; i <= 4; i++) document.getElementById(`step-${i}-content`).classList.add('hidden');
+  document.getElementById(`step-${currentStep}-content`).classList.remove('hidden');
+  document.getElementById('btn-back').classList.toggle('hidden', currentStep === 1);
+  document.getElementById('btn-next').textContent = currentStep === 4 ? '💾 Finish' : 'Next →';
+  if (currentStep === 4) document.getElementById('btn-next').classList.add('btn-success');
+  else document.getElementById('btn-next').classList.remove('btn-success');
+}
+
+function wizardNext() {
+  if (currentStep < 4) { currentStep++; renderWizardStep(); }
+  else { showToast('success', 'Promotion Published', 'The promotion is now active.'); setTimeout(() => showPage('promo-list'), 800); }
+}
+function wizardBack() { if (currentStep > 1) { currentStep--; renderWizardStep(); } }
+function wizardSave() {
+  showToast('success', 'Saved Successfully', 'Promotion draft has been saved.');
+}
+
+function showToast(type, title, msg) {
+  const container = document.getElementById('toast-container');
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  const t = document.createElement('div');
+  t.className = 'toast toast-' + type;
+  t.innerHTML = '<span class="toast-icon">' + (icons[type]||'ℹ') + '</span><div class="toast-body"><div class="toast-title">' + title + '</div><div class="toast-msg">' + msg + '</div></div><button class="toast-close" onclick="this.parentElement.classList.remove(\'show\');setTimeout(()=>this.parentElement.remove(),300)">✕</button>';
+  container.appendChild(t);
+  requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add('show'); }); });
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
+}
+function confirmLeaveWizard() {
+  if (wizardMode === 'view') { showPage('promo-list'); return; }
+  openModal('unsaved-modal');
+}
+
+/* Step 1 content */
+document.getElementById('step-1-content').innerHTML = `
+<div class="card"><div class="card-body">
+  <div class="form-group"><label class="form-label">Promotion Name <span class="required">*</span></label><input class="form-input" value="100% First Deposit Bonus"></div>
+  <div class="form-row form-row-2">
+    <div class="form-group"><label class="form-label">Promotion Type <span class="required">*</span></label><input class="form-input form-input-disabled" value="Deposit Bonus" disabled><div class="form-hint">Fixed after creation</div></div>
+    <div class="form-group"><label class="form-label">Promotion Period Type <span class="required">*</span></label><select class="form-select" id="period-type-select" onchange="toggleEndTime()"><option value="longterm">No End Date (Long-term)</option><option value="custom">Custom Period</option></select></div>
+  </div>
+  <div class="form-row form-row-2">
+    <div class="form-group"><label class="form-label">Start Time <span class="required">*</span></label><input class="form-input" type="datetime-local" value="2026-04-08T00:00"></div>
+    <div class="form-group" id="endtime-group"><label class="form-label">End Time</label><input class="form-input form-input-disabled" id="endtime-input" placeholder="N/A (Long-term selected)" disabled></div>
+  </div>
+  <div class="form-group"><label class="form-label">Internal Remark</label><textarea class="form-input" rows="2" placeholder="Internal notes, not visible to players">Q2 acquisition campaign for PH market</textarea></div>
+</div></div>`;
+
+function toggleEndTime() {
+  const sel = document.getElementById('period-type-select');
+  const inp = document.getElementById('endtime-input');
+  if (sel.value === 'custom') {
+    inp.type = 'datetime-local';
+    inp.disabled = false;
+    inp.classList.remove('form-input-disabled');
+    inp.placeholder = '';
+    inp.value = '';
+  } else {
+    inp.type = 'text';
+    inp.disabled = true;
+    inp.classList.add('form-input-disabled');
+    inp.placeholder = 'N/A (Long-term selected)';
+    inp.value = '';
+  }
+}
+
+/* Step 2 content */
+document.getElementById('step-2-content').innerHTML = `
+<div class="card">
+  <div class="card-header">Trigger Conditions</div>
+  <div class="card-body">
+    <p class="text-sm text-muted mb-lg">Each condition is an independent toggle. Enabled conditions are combined with AND.</p>
+    ${[
+      {id:'C1',en:'Nth Daily Deposit',zh:'當日第 N 筆存款',desc:'N=1 → daily first deposit. Resets at 00:00 GMT+8',field:'N',unit:'',val:'1',on:true},
+      {id:'C2',en:'Nth Lifetime Deposit',zh:'累計第 N 筆存款',desc:'N=1 → first-ever deposit. Lifetime count, no reset',field:'N',unit:'',val:'',on:false},
+      {id:'C3',en:'Daily Cumulative Deposit',zh:'當日累計存款',desc:'Sum of all deposits today ≥ X. Resets at 00:00 GMT+8',field:'Amount',unit:'₱',val:'',on:false},
+      {id:'C4',en:'Registration Window',zh:'註冊天數限制',desc:'Registration + X days > now. E.g. X=7 → within 7 days',field:'Days',unit:'days',val:'',on:false},
+      {id:'C5',en:'First Deposit Window',zh:'首存後時限',desc:'First deposit + X hours > now',field:'Hours',unit:'hours',val:'',on:false},
+    ].map(c => `
+      <div class="condition-row" style="display:grid;grid-template-columns:48px 1fr;gap:var(--sp-lg);padding:var(--sp-lg) 0;border-bottom:1px solid #f0f1f3;">
+        <div style="padding-top:2px"><label class="toggle" onclick="toggleCondition(this)"><input type="checkbox" ${c.on?'checked':''}><span class="toggle-slider"></span></label></div>
+        <div>
+          <div style="display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:4px">
+            <span class="condition-id">${c.id}</span>
+            <span class="condition-name ${c.on?'':'off'}">${c.en}</span>
+            <span class="text-xs text-muted">${c.zh}</span>
+          </div>
+          <div class="condition-desc" style="margin-bottom:var(--sp-sm)">${c.desc}</div>
+          <div class="condition-field-row" style="display:${c.on?'flex':'none'};align-items:center;gap:var(--sp-sm);margin-top:var(--sp-sm)">
+            ${c.unit==='₱'?'<span class="text-sm" style="font-weight:500">≥ ₱</span>':''}
+            <input class="form-input" style="width:120px" placeholder="${c.field}" value="${c.val}">
+            ${c.unit&&c.unit!=='₱'?'<span class="text-sm text-muted">'+c.unit+'</span>':''}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+    <div class="alert-box alert-info mt-lg" style="font-size:var(--font-xs)">💡 V2 will add: C6 Inactive Days, C7 Consecutive Deposit Days, C8 Daily Net Loss</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">Transaction Conditions</div>
+  <div class="card-body">
+    <div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Min Deposit <span class="required">*</span></label><input class="form-input" value="₱ 500"></div>
+      <div class="form-group"><label class="form-label">Max Deposit</label><input class="form-input" value="₱ 10,000"></div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">Participation Limits</div>
+  <div class="card-body">
+    <div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Max Claims Per User <span class="required">*</span></label><input class="form-input" value="1"></div>
+      <div class="form-group"><label class="form-label">Eligible Payment Methods</label><select class="form-select"><option>All</option></select></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Player Scope <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="scope" value="all" checked onchange="togglePlayerScope()"> All Players</label>
+        <label class="radio-item"><input type="radio" name="scope" value="include" onchange="togglePlayerScope()"> Include Specific Players</label>
+        <label class="radio-item"><input type="radio" name="scope" value="exclude" onchange="togglePlayerScope()"> Exclude Specific Players</label>
+        <label class="radio-item"><input type="radio" name="scope" value="abtest" onchange="togglePlayerScope()"> AB Test (Account Suffix)</label>
+      </div>
+    </div>
+    <div class="form-group hidden" id="player-id-input-group">
+      <label class="form-label" id="player-id-label">Player ID Input <span class="required">*</span></label>
+      <textarea class="form-input" id="player-id-textarea" rows="4" placeholder="Enter one Player ID per line"></textarea>
+      <div class="form-hint" id="player-id-hint">One Player ID per line</div>
+    </div>
+  </div>
+</div>`;
+
+function toggleCondition(toggleEl) {
+  setTimeout(() => {
+    const checked = toggleEl.querySelector('input').checked;
+    const row = toggleEl.closest('.condition-row');
+    const fieldRow = row.querySelector('.condition-field-row');
+    const name = row.querySelector('.condition-name');
+    if (fieldRow) fieldRow.style.display = checked ? 'flex' : 'none';
+    if (name) { name.classList.toggle('off', !checked); }
+    const inp = row.querySelector('.condition-field-row input');
+    if (inp) inp.disabled = !checked;
+  }, 10);
+}
+
+function togglePlayerScope() {
+  const val = document.querySelector('input[name="scope"]:checked').value;
+  const group = document.getElementById('player-id-input-group');
+  const label = document.getElementById('player-id-label');
+  const hint = document.getElementById('player-id-hint');
+  const textarea = document.getElementById('player-id-textarea');
+  if (val === 'all') {
+    group.classList.add('hidden');
+  } else {
+    group.classList.remove('hidden');
+    if (val === 'abtest') {
+      label.innerHTML = 'Account Suffix <span class="required">*</span>';
+      textarea.placeholder = 'Enter account suffix digits, e.g. 0,1,2';
+      hint.textContent = 'Comma-separated digits (0-9). Players whose account ends with these digits will be included.';
+    } else {
+      label.innerHTML = 'Player ID Input <span class="required">*</span>';
+      textarea.placeholder = 'Enter one Player ID per line';
+      hint.textContent = val === 'include' ? 'Only these players can participate' : 'These players are excluded from participation';
+    }
+  }
+}
+
+/* Step 3 content */
+document.getElementById('step-3-content').innerHTML = `
+<div class="card">
+  <div class="card-header">Bonus Configuration</div>
+  <div class="card-body">
+    <div class="form-group">
+      <label class="form-label">Bonus Value Type <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="bonusType" value="fixed" checked onchange="toggleBonusType()"> Fixed Amount</label>
+        <label class="radio-item"><input type="radio" name="bonusType" value="percentage" onchange="toggleBonusType()"> Percentage</label>
+      </div>
+    </div>
+    <div class="form-row form-row-3">
+      <div class="form-group" id="bonus-amount-group">
+        <label class="form-label" id="bonus-amount-label">Bonus Amount <span class="required">*</span></label>
+        <input class="form-input" id="bonus-amount-input" placeholder="e.g. 500">
+      </div>
+      <div class="form-group" id="bonus-pct-group">
+        <label class="form-label" id="bonus-pct-label" style="color:var(--color-text-disabled)">Bonus Percentage</label>
+        <input class="form-input form-input-disabled" id="bonus-pct-input" placeholder="Disabled when Fixed Amount" disabled>
+      </div>
+      <div class="form-group" id="bonus-cap-group">
+        <label class="form-label" id="bonus-cap-label" style="color:var(--color-text-disabled)">Bonus Cap</label>
+        <input class="form-input form-input-disabled" id="bonus-cap-input" placeholder="—" disabled>
+      </div>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"> <span class="text-sm">Exclude From Rebate Calculation</span></label>
+      <div class="form-hint">When checked, bets during this promotion's ACTIVE period won't count toward cashback/rebate.</div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">Bonus Turnover Settings</div>
+  <div class="card-body">
+    <div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Bonus Turnover Model <span class="required">*</span></label>
+        <select class="form-select" id="turnover-model" onchange="updateFormulaPreview()"><option value="A">Model A: Principal + Bonus</option><option value="B">Model B: Principal Only</option><option value="C">Model C: Bonus Only</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Bonus Turnover Multiplier <span class="required">*</span></label><input class="form-input" id="turnover-mult" placeholder="e.g. 30" oninput="updateFormulaPreview()" style="text-align:right"></div>
+    </div>
+    <div class="alert-box alert-info" style="font-size:var(--font-sm)" id="formula-preview">
+      <strong>Formula Preview:</strong> Enter a multiplier to see the formula
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">Contribution Rules</div>
+  <div class="card-body">
+    <div class="contrib-tabs" id="contrib-tabs">
+      <span class="contrib-tab active" onclick="switchContribTab(0)">Category Default</span>
+      <span class="contrib-tab" onclick="switchContribTab(1)">Provider Override</span>
+      <span class="contrib-tab" onclick="switchContribTab(2)">Game Override</span>
+    </div>
+    <div id="contrib-panel-0">
+      <table><thead><tr><th>Category</th><th style="width:120px">Contribution Rate</th></tr></thead>
+      <tbody>${['SLOT|100','FISH|80','TABLE|15','ARCADE|60','EGAME|50','LIVE|10'].map(r => {
+        const [cat,rate] = r.split('|');
+        return '<tr><td style="font-weight:500">'+cat+'</td><td><input class="form-input" value="'+rate+'%" style="width:80px;text-align:center"></td></tr>';
+      }).join('')}</tbody></table>
+      <div class="form-hint mt-md">💡 0% = bets on this category won't contribute to bonus turnover progress</div>
+    </div>
+    <div id="contrib-panel-1" class="hidden">
+      <div class="flex justify-between items-center mb-md"><span class="text-sm text-muted">Override contribution rates for specific providers</span><button class="btn btn-outline btn-sm" onclick="addProviderRow()">+ Add Provider</button></div>
+      <table><thead><tr><th>Provider</th><th style="width:100px">Rate</th><th style="width:36px"></th></tr></thead>
+      <tbody id="provider-tbody"><tr><td><select class="form-select" style="width:200px"><option value="">Select Provider...</option><option>PG Soft</option><option>Pragmatic Play</option><option>Evolution</option><option>Jili</option><option>Spadegaming</option><option>CQ9</option><option>Fa Chai</option><option>Rich88</option><option>BNG</option><option>Hacksaw</option></select></td><td><input class="form-input" placeholder="%" style="width:80px;text-align:center"></td><td><span class="action-icon danger" onclick="this.closest('tr').remove()">✕</span></td></tr></tbody></table>
+    </div>
+    <div id="contrib-panel-2" class="hidden">
+      <div class="flex justify-between items-center mb-md"><span class="text-sm text-muted">Override contribution rates for specific games (highest priority)</span><button class="btn btn-outline btn-sm" onclick="addGameRow()">+ Add Game</button></div>
+      <table><thead><tr><th>Game Code</th><th style="width:100px">Rate</th><th style="width:36px"></th></tr></thead>
+      <tbody id="game-tbody"><tr><td><input class="form-input" placeholder="e.g. pg-fortune-tiger" style="width:240px"></td><td><input class="form-input" placeholder="%" style="width:80px;text-align:center"></td><td><span class="action-icon danger" onclick="this.closest('tr').remove()">✕</span></td></tr></tbody></table>
+    </div>
+  </div>
+</div>`;
+
+function toggleBonusType() {
+  const val = document.querySelector('input[name="bonusType"]:checked').value;
+  const amtInput = document.getElementById('bonus-amount-input');
+  const amtLabel = document.getElementById('bonus-amount-label');
+  const pctInput = document.getElementById('bonus-pct-input');
+  const pctLabel = document.getElementById('bonus-pct-label');
+  const capInput = document.getElementById('bonus-cap-input');
+  const capLabel = document.getElementById('bonus-cap-label');
+  if (val === 'fixed') {
+    amtInput.disabled = false; amtInput.classList.remove('form-input-disabled'); amtInput.placeholder = 'e.g. 500';
+    amtLabel.innerHTML = 'Bonus Amount <span class="required">*</span>'; amtLabel.style.color = '';
+    pctInput.disabled = true; pctInput.classList.add('form-input-disabled'); pctInput.placeholder = 'Disabled when Fixed Amount'; pctInput.value = '';
+    pctLabel.innerHTML = 'Bonus Percentage'; pctLabel.style.color = 'var(--color-text-disabled)';
+    capInput.disabled = true; capInput.classList.add('form-input-disabled'); capInput.placeholder = '—'; capInput.value = '';
+    capLabel.style.color = 'var(--color-text-disabled)';
+  } else {
+    amtInput.disabled = true; amtInput.classList.add('form-input-disabled'); amtInput.placeholder = 'Disabled when Percentage'; amtInput.value = '';
+    amtLabel.innerHTML = 'Bonus Amount'; amtLabel.style.color = 'var(--color-text-disabled)';
+    pctInput.disabled = false; pctInput.classList.remove('form-input-disabled'); pctInput.placeholder = 'e.g. 50%';
+    pctLabel.innerHTML = 'Bonus Percentage <span class="required">*</span>'; pctLabel.style.color = '';
+    capInput.disabled = false; capInput.classList.remove('form-input-disabled'); capInput.placeholder = 'Optional max cap';
+    capLabel.style.color = '';
+  }
+}
+
+function updateFormulaPreview() {
+  const model = document.getElementById('turnover-model').value;
+  const mult = document.getElementById('turnover-mult').value;
+  const el = document.getElementById('formula-preview');
+  if (!mult || isNaN(mult) || Number(mult) <= 0) {
+    el.innerHTML = '<strong>Formula Preview:</strong> Enter a multiplier to see the formula';
+    return;
+  }
+  const m = Number(mult);
+  const formulas = {
+    A: {label:'(Principal + Bonus)',example:'(₱1,000 + ₱500)',base:1500},
+    B: {label:'Principal',example:'₱1,000',base:1000},
+    C: {label:'Bonus',example:'₱500',base:500},
+  };
+  const f = formulas[model];
+  const target = (f.base * m).toLocaleString();
+  el.innerHTML = '<strong>Formula Preview:</strong> Target = '+f.label+' × '+m+' = '+f.example+' × '+m+' = ₱'+target;
+}
+
+function switchContribTab(idx) {
+  document.querySelectorAll('#contrib-tabs .contrib-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  for (let i=0;i<3;i++) document.getElementById('contrib-panel-'+i).classList.toggle('hidden', i!==idx);
+}
+function addProviderRow() {
+  document.getElementById('provider-tbody').insertAdjacentHTML('beforeend',
+    '<tr><td><select class="form-select" style="width:200px"><option value="">Select Provider...</option><option>PG Soft</option><option>Pragmatic Play</option><option>Evolution</option><option>Jili</option><option>Spadegaming</option><option>CQ9</option><option>Fa Chai</option><option>Rich88</option><option>BNG</option><option>Hacksaw</option></select></td><td><input class="form-input" placeholder="%" style="width:80px;text-align:center"></td><td><span class="action-icon danger" onclick="this.closest(\'tr\').remove()">✕</span></td></tr>');
+}
+function addGameRow() {
+  document.getElementById('game-tbody').insertAdjacentHTML('beforeend',
+    '<tr><td><input class="form-input" placeholder="e.g. pg-fortune-tiger" style="width:240px"></td><td><input class="form-input" placeholder="%" style="width:80px;text-align:center"></td><td><span class="action-icon danger" onclick="this.closest(\'tr\').remove()">✕</span></td></tr>');
+}
+
+/* Step 4 content */
+document.getElementById('step-4-content').innerHTML = `
+<div class="two-col">
+  <div>
+    <div class="card">
+      <div class="card-header">Promotion Display</div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Promotion Tag</label><input class="form-input" id="f-tag" value="FIRST DEPOSIT" placeholder="e.g. FIRST DEPOSIT, RELOAD" oninput="updatePreview()"></div>
+        <div class="form-group"><label class="form-label">Card Icon <span class="required">*</span></label>
+          <div style="display:flex;gap:var(--sp-lg);align-items:center">
+            <div style="width:100px;height:72px;border:2px dashed var(--color-border);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:var(--font-sm);cursor:pointer">📷 Upload</div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Main Title <span class="required">*</span></label><input class="form-input" id="f-title" value="100% First Deposit Bonus" oninput="updatePreview()"></div>
+        <div class="form-group"><label class="form-label">Subtext / Summary <span class="required">*</span></label><input class="form-input" id="f-subtext" value="Up to ₱5,000 · 30x Turnover" oninput="updatePreview()"></div>
+        <div class="form-group"><label class="form-label">Deposit Page Info Box</label><textarea class="form-input" id="f-infobox" rows="2" oninput="updatePreview()">🎁 Deposit now and get 100% bonus up to ₱5,000!</textarea></div>
+        <div class="form-group">
+          <label class="form-label">Detailed T&C <span class="required">*</span></label>
+          <div class="editor-toolbar">
+            ${['B','I','H1','H2','H3','•','1.','🔗','—','"'].map(b => `<span class="toolbar-btn">${b}</span>`).join('')}
+          </div>
+          <div class="editor-body" contenteditable="true" id="f-tc" oninput="updatePreview()">
+            <h3 style="margin-bottom:8px">Terms & Conditions</h3>
+            <ol style="padding-left:20px;line-height:2">
+              <li>Minimum deposit: ₱500</li>
+              <li>Bonus will be credited automatically</li>
+              <li>30x turnover requirement applies to (Principal + Bonus)</li>
+              <li>Only SLOT and FISH contribute 100%</li>
+              <li>Bonus expires after 7 days if turnover is not met</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card" style="position:sticky;top:20px">
+      <div class="card-header">Overall Preview <span class="text-xs text-muted" style="font-weight:normal;margin-left:8px">(即時更新)</span></div>
+      <div class="card-body">
+        <div class="preview-section">
+          <div class="preview-label">Activity Card</div>
+          <div class="preview-card">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <span class="badge badge-warning" style="font-size:9px" id="p-tag">FIRST DEPOSIT</span>
+              <div style="width:40px;height:40px;background:#e8eaee;border-radius:6px;display:flex;align-items:center;justify-content:center">📷</div>
+            </div>
+            <div style="font-weight:600;margin-top:8px" id="p-title">100% First Deposit Bonus</div>
+            <div class="text-xs text-muted" id="p-subtext">Up to ₱5,000 · 30x Turnover</div>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px;font-size:11px;padding:4px 14px;border-radius:999px">Deposit</button>
+          </div>
+        </div>
+        <div class="preview-section">
+          <div class="preview-label">Deposit Page Info Box</div>
+          <div class="preview-card"><span class="text-sm" id="p-infobox">🎁 Deposit now and get 100% bonus up to ₱5,000!</span></div>
+        </div>
+        <div class="preview-section">
+          <div class="preview-label">Terms & Conditions</div>
+          <div class="preview-card text-sm" style="line-height:1.8" id="p-tc">
+            <strong>Terms & Conditions</strong><br>
+            1. Minimum deposit: ₱500<br>2. Bonus credited automatically<br>3. 30x turnover requirement<br>4. SLOT/FISH = 100% contribution<br>5. Expires after 7 days
+          </div>
+        </div>
+        <div class="text-xs text-muted mt-lg">✨ Preview updates in real-time as you edit</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+function updatePreview() {
+  const tag = document.getElementById('f-tag');
+  const title = document.getElementById('f-title');
+  const sub = document.getElementById('f-subtext');
+  const info = document.getElementById('f-infobox');
+  const tc = document.getElementById('f-tc');
+  if (tag) document.getElementById('p-tag').textContent = tag.value || '(no tag)';
+  if (title) document.getElementById('p-title').textContent = title.value || '(no title)';
+  if (sub) document.getElementById('p-subtext').textContent = sub.value || '(no subtext)';
+  if (info) document.getElementById('p-infobox').textContent = info.value || '(empty)';
+  if (tc) document.getElementById('p-tc').innerHTML = tc.innerHTML;
+}
+
+/* ═══════════════════════════════════════════
+   REWARD HISTORY TABLE
+   ═══════════════════════════════════════════ */
+const badgeMap = {
+  GRANTED:'badge-success', CLAIMABLE:'badge-warning', EXPIRED:'badge-danger', REVOKED:'badge-danger',
+  ACTIVE:'badge-primary', PENDING:'badge-warning', COMPLETED:'badge-success', OUT_OF_BALANCE:'badge-info', CANCELLED:'badge-danger',
+};
+
+function renderRewardTable() {
+  const tbody = document.getElementById('reward-table-body');
+  tbody.innerHTML = rewards.map((r, i) => `
+    <tr>
+      <td>${r.canCheck ? '<input type="checkbox" class="checkbox reward-check" onchange="updateBatchCount()">' : ''}</td>
+      <td class="cell-link" onclick="openRewardDrawer(${i})">${r.rid}</td>
+      <td class="${r.pid==='—'?'cell-muted':'cell-link'}" ${r.pid!=='—' ? 'onclick="showPage(\'promo-list\')"' : ''}>${r.pid}</td>
+      <td>${r.plid}</td>
+      <td>${r.uname}</td>
+      <td class="text-sm">${r.rtype}</td>
+      <td><span class="badge ${badgeMap[r.rs]||'badge-muted'}">${r.rs}</span></td>
+      <td>${r.ts!=='—' ? `<span class="badge ${badgeMap[r.ts]||'badge-muted'}">${r.ts}</span>` : '<span class="cell-muted">—</span>'}</td>
+      <td style="font-weight:500">${r.amt}</td>
+      <td class="text-sm ${r.prog==='—'?'cell-muted':''}">${r.prog}</td>
+      <td class="text-xs text-muted">${r.gAt}</td>
+      <td class="text-xs ${r.eAt==='—'?'cell-muted':'text-muted'}">${r.eAt}</td>
+      <td>
+        <div class="table-actions">
+          <span class="action-icon" title="View" onclick="openRewardDrawer(${i})">👁</span>
+          ${r.canCheck ? `<span class="action-icon danger" title="Cancel" onclick="openCancelModal('${r.ts}')">✕</span>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════
+   REWARD DETAIL DRAWER
+   ═══════════════════════════════════════════ */
+function openRewardDrawer(idx) {
+  const r = rewards[idx];
+  const d = r.detail;
+  let html = '';
+
+  // §5.1 Basic Information
+  html += `<div class="drawer-section">
+    <div class="drawer-section-header">📋 Basic Information</div>
+    <div class="drawer-section-body">
+      ${detailRow('Reward ID', r.rid)}
+      ${detailRow('Promotion ID', r.pid !== '—' ? `<span class="cell-link" onclick="closeDrawer();showPage('promo-list')">${r.pid}</span>` : '—')}
+      ${detailRow('Player ID', r.plid)}
+      ${detailRow('Reward Type', r.rtype)}
+      ${detailRow('Reward Name', d.rewardName || '—')}
+      ${detailRow('Grant Method', d.grantMethod)}
+      ${detailRow('Reward Status', `<span class="badge ${badgeMap[r.rs]}">${r.rs}</span>`)}
+      ${detailRow('Reward Amount', r.amt)}
+      ${detailRow('Cashback Percentage', d.cashbackPct)}
+      ${detailRow('Granted At', r.gAt)}
+      ${detailRow('Ended At', r.eAt)}
+    </div>
+  </div>`;
+
+  // §5.2 Bonus Turnover (only if has turnover)
+  if (d.model) {
+    const progressColor = r.ts === 'CANCELLED' ? 'var(--color-danger)' : r.ts === 'COMPLETED' ? 'var(--color-success)' : 'var(--color-primary)';
+    html += `<div class="drawer-section">
+      <div class="drawer-section-header">📊 Bonus Turnover</div>
+      <div class="drawer-section-body">
+        ${detailRow('Bonus Turnover Status', `<span class="badge ${badgeMap[r.ts]}">${r.ts}</span>`)}
+        ${detailRow('Bonus Turnover Model', d.model)}
+        ${detailRow('Bonus Turnover Multiplier', d.mult)}
+        ${detailRow('Principal Amount', d.principal)}
+        ${detailRow('Bonus Amount', d.bonus)}
+        ${detailRow('Bonus Turnover Target', d.target)}
+        ${detailRow('Bonus Turnover Progress', d.progress)}
+        ${detailRow('Bonus Turnover Remaining', d.remaining)}
+        ${detailRow('Exclude From Rebate Calculation', d.exclRebate)}
+        <div class="progress-bar"><div class="progress-fill" style="width:${d.pct}%;background:${progressColor}"></div></div>
+        <div class="flex justify-between mt-sm">
+          <span class="text-xs" style="font-weight:600;color:${progressColor}">${d.pct}%</span>
+          <span class="text-xs text-muted">${d.progress} / ${d.target}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // §5.3 Cancel Record (only if CANCELLED)
+  if (d.cancel) {
+    html += `<div class="drawer-section">
+      <div class="drawer-section-header danger">🚫 Cancel Record</div>
+      <div class="drawer-section-body">
+        ${detailRow('Cancel Reason', d.cancel.reason)}
+        ${detailRow('Remark', d.cancel.remark)}
+        ${detailRow('Operator', d.cancel.operator)}
+        ${detailRow('Cancelled At', d.cancel.cancelledAt)}
+      </div>
+    </div>`;
+  }
+
+  // §5.4 Cancel button (only if ACTIVE or PENDING)
+  if (r.ts === 'ACTIVE' || r.ts === 'PENDING') {
+    html += `<div class="drawer-footer">
+      <button class="btn btn-outline-danger w-full" onclick="openCancelModal('${r.ts}')" style="justify-content:center">✕ Cancel</button>
+    </div>`;
+  }
+
+  document.getElementById('drawer-content').innerHTML = html;
+  document.getElementById('reward-drawer').classList.add('open');
+}
+
+function detailRow(label, value) {
+  return `<div class="detail-row"><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>`;
+}
+
+function closeDrawer() { document.getElementById('reward-drawer').classList.remove('open'); }
+document.getElementById('reward-drawer').addEventListener('click', e => { if (e.target.id === 'reward-drawer') closeDrawer(); });
+
+/* ═══════════════════════════════════════════
+   MODALS
+   ═══════════════════════════════════════════ */
+function openCancelModal(status) {
+  let alertText = '';
+  if (status === 'BATCH') {
+    const count = document.querySelectorAll('.reward-check:checked').length;
+    alertText = `<strong>Batch Cancel — ${count} selected reward(s):</strong><br>
+      • All selected ACTIVE/PENDING bonus turnover → CANCELLED<br>
+      • Player balances remain unchanged — adjust manually if needed<br>
+      • Next PENDING bonus turnover (if any) will auto-activate per FIFO queue`;
+  } else if (status === 'ACTIVE') {
+    alertText = `<strong>This action will:</strong><br>
+      • Cancel this ACTIVE bonus turnover → CANCELLED<br>
+      • Player balance remains unchanged — adjust manually if needed<br>
+      • Next PENDING bonus turnover (if any) will auto-activate per FIFO queue`;
+  } else {
+    alertText = `<strong>This action will:</strong><br>
+      • Cancel this PENDING bonus turnover → CANCELLED<br>
+      • Remove it from the FIFO queue`;
+  }
+  document.getElementById('cancel-alert-text').innerHTML = alertText;
+  openModal('cancel-modal');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function confirmCancelReward() {
+  const reason = document.getElementById('cancel-reason-select').value;
+  const remark = document.getElementById('cancel-remark-input').value.trim();
+  const errEl = document.getElementById('cancel-remark-error');
+  if (!reason) { alert('Please select a cancel reason.'); return; }
+  if (remark.length < 2) { errEl.classList.remove('hidden'); document.getElementById('cancel-remark-input').focus(); return; }
+  errEl.classList.add('hidden');
+  closeModal('cancel-modal');
+  showToast('success','Reward Cancelled','The bonus reward has been cancelled.');
+  // Reset form
+  document.getElementById('cancel-reason-select').value = '';
+  document.getElementById('cancel-remark-input').value = '';
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════ */
+renderPromoTable();
+renderRewardTable();
+</script>
+
+</body>
+</html>

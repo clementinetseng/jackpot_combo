@@ -1,0 +1,36 @@
+{
+  "description": "4px base spacing scale",
+  "scale": {
+    "0":   { "value": "0px" },
+    "0.5": { "value": "2px" },
+    "1":   { "value": "4px" },
+    "1.5": { "value": "6px" },
+    "2":   { "value": "8px" },
+    "3":   { "value": "12px" },
+    "4":   { "value": "16px" },
+    "5":   { "value": "20px" },
+    "6":   { "value": "24px" },
+    "8":   { "value": "32px" },
+    "10":  { "value": "40px" },
+    "12":  { "value": "48px" },
+    "16":  { "value": "64px" },
+    "20":  { "value": "80px" }
+  },
+
+  "containerPadding": {
+    "mobile":  { "value": "12px", "description": "px-3 on <768px" },
+    "tablet":  { "value": "16px", "description": "px-4 on 768~1024" },
+    "desktop": { "value": "24px", "description": "px-6 on >1024" }
+  },
+
+  "sectionGap": {
+    "mobile":  { "value": "12px" },
+    "desktop": { "value": "20px" }
+  },
+
+  "cardPadding": {
+    "compact": { "value": "12px" },
+    "default": { "value": "16px" },
+    "loose":   { "value": "24px" }
+  }
+}

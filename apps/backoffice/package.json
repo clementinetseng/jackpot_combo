@@ -1,0 +1,12 @@
+{
+  "name": "igaming-backoffice-prototype",
+  "version": "1.0.0",
+  "description": "iGaming Backoffice Prototype — Promotion Management & Reward History",
+  "scripts": {
+    "start": "npx serve -s . -l $PORT",
+    "dev": "npx serve -s . -l 3000"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}

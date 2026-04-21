@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: igaming-frontend-prototype
+    env: node
+    buildCommand: "true"
+    startCommand: "npx serve -s . -l $PORT"
+    plan: free

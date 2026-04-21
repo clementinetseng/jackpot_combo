@@ -1,0 +1,25 @@
+# Render Monorepo Config
+# Deploys two services from a single repo.
+# https://render.com/docs/infrastructure-as-code
+
+services:
+  # ====== Backoffice (operator-facing prototype) ======
+  - type: web
+    name: jackpot-backoffice-prototype
+    runtime: node
+    rootDir: apps/backoffice
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+
+  # ====== Player (PH consumer-facing prototype) ======
+  - type: web
+    name: jackpot-player-prototype
+    runtime: node
+    rootDir: apps/player
+    plan: free
+    buildCommand: "true"
+    startCommand: "npx serve -s . -l $PORT"
