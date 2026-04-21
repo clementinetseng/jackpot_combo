@@ -111,5 +111,58 @@
 
 | # | 決策 | 理由 | 執行狀態 | 日期 |
 |---|------|------|---------|------|
-| D60 | Gift Box / Reward Center 採 **Section 式分類**（參考 Rainbet pattern）：`Active Promotion` + `For You`（V1 核心）+ `Claim Now` / `VIP` / `Rakeback` / `Total Rewards`（V2 預留）；無資料 Section 整段隱藏，不留空列 | 保持 layout 擴充性，V2 加新類型活動時不用重排；Rainbet pattern 驗證過的 UX | ✅ 前台 PRD §3 / §4 | 2026/04 |
+| D60 | Gift Box / Reward Center 採 **Section 式分類**（參考 Rainbet pattern）：`Active Promotion` + `For You`（V1 核心）+ `Claim Now` / `VIP` / `Rakeback` / `Total Rewards`（V2 預留）；無資料 Section 整段隱藏，不留空列 | 保持 layout 擴充性，V2 加新類型活動時不用重排 | ✅ 前台 PRD §3 / §4 | 2026/04 |
 | D61 | Record 頁**僅新增 Promotion Tab**，Transaction / Game 由現有平台提供（不重複寫規格） | 避免 PRD 擴散；現有平台已有成熟實作 | ✅ 前台 PRD §5 | 2026/04 |
+
+## Session 7（前台 Prototype v2 迭代 — 2026-04-21）
+
+> 基於 PP 實機（已登入 KYC 完成）重新對齊設計語言 + 經 Clement 20 輪反饋迭代。所有決策以最終 prototype 為準。
+
+| # | 決策 | 理由 | 執行狀態 |
+|---|------|------|---------|
+| D62 | 設計主題從 **UAT 藍 `#5275E9`** 改為 **PP 實機糖果紫**（淡紫漸層背景 + 白色內容卡 + 藍紫漸層 CTA + 黃 `#FFC107` Balance 強調） | 之前誤判 UAT 登出狀態為白底藍；實測 PP 登入後為糖果紫 | ✅ `apps/player` + design-system/tokens |
+| D63 | Deposit 頁**沿用 PP 骨架** 插入促銷模組（Payment → Choose bonus → Amount → Summary → Submit） | 降低 RD 改動成本；視覺一致 | ✅ 前台 PRD §1 |
+| D64 | Deposit 頁**不顯示 TurnoverStatus 卡**（與 Wallet pill / Gift Box 冗餘） | 專注儲值決策，不分散注意力 | ✅ 前台 PRD §1 |
+| D65 | `Choose a Promotion` → **`Choose your bonus`**；`X eligible` → `X available` | PH 玩家對 `eligible` 抽象；BC.GAME pattern 驗證 | ✅ 前台 PRD §1.6 |
+| D66 | 選擇促銷改為 **Dropdown (radio list)**（取代 card grid） | Clement 反饋：card grid 視覺複雜；dropdown 省空間 | ✅ 前台 PRD §1.6 |
+| D67 | Reward / Gift Box 活動卡主 CTA **`Claim Now`**（取代 `Deposit to Join`） | 和 Rainbet/BC.GAME pattern 一致；簡潔 | ✅ 前台 PRD §3 / §4 |
+| D68 | Summary **去 View T&C 連結**（上方 dropdown 已有）+ **去 🔒 Withdrawal locked 副標**（`Bet to withdraw ₱X` 已清楚） | 消除重複 + 精簡 | ✅ 前台 PRD §1.7 |
+| D69 | Withdraw 頁**阻擋時整個 form 灰掉**（`opacity-50 pointer-events-none`）；Submit 文案 `🔒 Locked — Complete the requirements above` | 避免玩家在阻擋時可操作底下欄位 | ✅ 前台 PRD §2.5 |
+| D70 | Withdraw `Available Balance` 的 **`ⓘ` popover 完全移除** | 阻擋時整個 form 灰掉 ⓘ 點不了；無阻擋時 Balance=Withdrawable 一目了然 | ✅ 前台 PRD §2.4 |
+| D71 | Blocker Card 加 **`Why is withdrawal locked?` 簡短 intro + `Learn more →` Modal**；Modal 保留 intro + Progress 方塊 + **FAQ accordion（寫死 + 動態代入）** | 減少客訴；PH 玩家自助查 FAQ | ✅ 前台 PRD §2.5 |
+| D72 | Gift Box **三狀態互斥**（只顯示一個 Status block）：A 有 Active → Active 卡含進度；B 僅 Deposit Turnover → Turnover 進度；C 可提款 → **不顯示 status row** | 消除 TurnoverStatus 與 Active Promotion 並列冗餘 | ✅ 前台 PRD §3 |
+| D73 | Gift Box **不顯示 Pending 活動詳細**，改一行 `+ N more pending · View in Rewards →` 提示 | Clement 偏好：pending 完整資訊放 Reward Center | ✅ 前台 PRD §3 |
+| D74 | **OOB Welcome banner 移除**，OOB 後走正常流程（不特別提示） | Clement 偏好：無需特殊 UI 中斷 | ✅ 前台 PRD §1（刪 §1.10） |
+| D75 | Record 卡片重設：**Status badge 放前、活動名主位、Bonus 金額移右小字**；左側彩色 border 依 Status 著色 | 玩家最關心狀態 > Bonus 數字 | ✅ 前台 PRD §5 |
+| D76 | Record 頁**日期範圍 + Filter Popover**（仿 PP 圖）：兩 date input + 紫色方塊 Filter icon（SVG 漏斗）+ Popover 含 Status pill grid + Reset / OK | 對齊 PP 實機交互 | ✅ 前台 PRD §5 |
+| D77 | **術語嚴格對齊 PRD**：禁用 `wager / wagered / wagering / WR / bet target / bet requirement`；統一用 `Bet`（動詞）+ `Turnover`（名詞）+ `Bet ₱X more to withdraw`（絕對金額） | 避免 Stake 等競品術語污染；維持 PRD 單一 source of truth | ✅ 全 prototype + glossary |
+| D78 | `Rewards` / `Reward Center` 為**玩家文案**；`Gift Box Dropdown` / `Gift Box Panel` 為**內部代稱** | 避免與後台 `Promotion Event` 混淆 | ✅ 前台 PRD §0.4 + glossary |
+| D79 | **KYC 未完成 scenario** 從 Demo Controls **刪除**（state.kycPassed 預設 true；Withdraw KYC blocker 邏輯保留給 RD V1 實作用） | Clement 偏好：demo 不重現此路徑；邏輯仍在程式碼 | ✅ `apps/player` |
+| D80 | **Mobile-first 優化**：Header 壓縮右側（Balance compact + Deposit 黃 CTA + 🎁 + Avatar）；新增 **Hamburger Drawer**；頁面 grid 改為 `flex flex-col md:grid md:grid-cols-[140px_1fr]` | PH 玩家 80%+ 使用手機 | ✅ 全 app |
+| D81 | **Monorepo 重組**：`apps/backoffice` + `apps/player` + `design-system/` + `docs/`；根 `render.yaml` 一 repo 部署兩 service；GitHub `clementinetseng/jackpot_combo`；Render 兩 service 已上線 | 前後台共享 design system + PRD | ✅ 已部署 |
+
+### Session 7 重點總結（給新 session handoff 用）
+
+1. **設計視覺 = 糖果紫**（PP 實機），非藍底也非深色
+2. **術語嚴謹** = 只用 `Bet` + `Turnover`，禁 `wager/WR/bet target`
+3. **UI 元件命名**：Gift Box Dropdown（internal）= Rewards（player-facing）= Reward Center（頁）
+4. **三個共用原則**：一個進度條原則（D53）/ 空狀態規則（D59）/ Section 式擴充位（D60）
+5. **前後台在同一 repo**，但 theme 拆：`brand.player`（紫）vs `brand.backoffice`（藍）
+
+## Session 8（後台 Prototype P0 Bug 修 + Enable 驗證 — 2026-04-21）
+
+| # | 決策 | 理由 | 執行狀態 |
+|---|------|------|---------|
+| D82 | **後台 Sidebar 縮減為 2 項**：僅保留 `Promotion Management` + `Reward History`；移除 Dashboard / Transactions / Players / Reports / Settings（未實作也非本專案 scope） | Prototype 要交給 RD，多餘入口造成誤會 | ✅ `apps/backoffice/index.html` |
+| D83 | **Status Toggle bug 修復**：`<label><input type=checkbox>` 原生 click 會先翻 checkbox 再跑 onclick，導致取消彈窗後視覺漂移；解法 = label + input 雙重 `event.preventDefault()` + 每次 `togglePromoStatus` 結尾強制 `renderPromoTable()` 重繪 | 解決「enabled/disabled 共用彈窗」現象 | ✅ `apps/backoffice/index.html` |
+| D84 | **Wizard 三模式對齊 PRD**：Page title 依 `wizardMode` 切 Create / Edit / View；View 隱藏 Save 按鈕、Step 4 Next 改 `Done`；Finish toast 文案改 `New promotion saved as Disabled. Enable it from the Promotion Management list.`（取代舊 `Promotion Published`） | PRD §Create Promotion 明訂 Wizard 只負責儲存內容；啟用回列表處理 | ✅ PRD 對齊 |
+| D85 | **Step 3 Category Default 全 6 類必填**，Next 擋控 + 紅框 + Toast | PRD §Step 3 Contribution Rules Category Default = Yes（6 類寫死） | ✅ `validateStep3()` |
+| D86 | **Deactivate Confirmation Modal 文案細節對齊 PRD**：impact #3 補 `and can still be completed`；Remark placeholder 加 `(Min 2 chars)`；Remark <2 字加 `input-error` 紅框 + 錯誤訊息 | PRD §Enabled → Disabled 二次確認 逐字對齊 | ✅ `deactivate-modal` |
+| D87 | **Disabled → Enabled 必填欄位驗證**（PRD §操作規則 line 77）：不跳確認視窗；若有缺項 → Toast 列出缺項（`Step N · Field`）+ 500ms 後自動跳到**第一個缺項所在 step 的 Edit wizard**；無缺項直接切 Enabled。mock data 用 `_missing[]` 模擬兩種狀態（`Weekend Special` 完整、`New Player Welcome` 缺 3 項）| PRD 明訂「必須完成 Basic Setup / Condition / Reward & Turnover / Info / Announcement 必要欄位」；Step 1 Promotion Name 規則補一句「Save 可先存半成品，但 Enable 前必須完整」| ✅ `togglePromoStatus` |
+
+### Session 8 重點總結
+
+1. **後台 Prototype P0 bug 全修**（Sidebar 縮減 / Toggle 邏輯 / Category Default 擋 Next / 頁面正名 / Enable 必填驗證）
+2. **Wizard 三模式對齊 PRD**（Create / Edit / View；Wizard 只儲存不啟用）
+3. **已 deploy**：https://jackpot-backoffice-prototype.onrender.com/
+4. **下一任務**（新 session）：把 D62~D81（前台）+ D82~D87（後台）**反向同步**寫回對應 PRD 章節，讓 RD 看單一 PRD 就完整

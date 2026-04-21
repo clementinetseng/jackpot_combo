@@ -1,5 +1,15 @@
 # Memory
 
+> **新 session 啟動：請先讀 `SESSION-HANDOFF.md`**（repo 根目錄），再讀本文件。
+
+## 🚀 Live 部署
+
+| 服務 | URL |
+| --- | --- |
+| GitHub Repo | https://github.com/clementinetseng/jackpot_combo |
+| 後台 Prototype | https://jackpot-backoffice-prototype.onrender.com/ |
+| 前台 Prototype | https://jackpot-player-prototype.onrender.com/ |
+
 ## Me
 Clement (clementine.tseng@the-force.com.tw), PM at The Force. 負責 iGaming 平台的促銷活動系統與流水引擎設計。
 
@@ -18,19 +28,20 @@ Clement (clementine.tseng@the-force.com.tw), PM at The Force. 負責 iGaming 平
 | 流水引擎 PRD | **定案 (V1.2)** | `docs/prds/流水引擎（Turnover Engine）PRD.md` | 核心引擎 PRD；§2.3/§2.4/§10.5/§10.7 已依 D39/D52/D58 補強 |
 | 活動設定管理 PRD | **定案** | `docs/prds/活動設定管理 (Promotion Management) PRD.md` | 後台促銷活動設定 |
 | 獎勵紀錄總表 PRD | **定案** | `docs/prds/後台-玩家獎勵紀錄總表 (Reward History) PRD.md` | 後台獎勵紀錄查詢+取消 |
-| **前台-玩家端 PRD** | **V1.0 定案** | `docs/prds/前台-玩家端 (Frontend) PRD.md` | Deposit/Withdraw/Gift Box/Reward Center/Record 五頁；整合 Gap Analysis D37~D59 |
+| **前台-玩家端 PRD** | **V1.0 定案** (需反向同步 D62~D81) | `docs/prds/前台-玩家端 (Frontend) PRD.md` | 5 頁完整規格；Session 7 prototype 迭代 D62~D81 待寫回 PRD 對應章節 |
 | PRD Cross Review Report | 完成 | `docs/prds/PRD_Cross_Review_Report.md` | 三份 PRD 交叉檢查報告 |
 | PRD Review Report | 完成 | `docs/prds/PRD_Review_Report.md` | PRD 審查報告 |
 | 多 Agent 治理規劃 | 完成 | `docs/memory/governance/multi-agent-plan.md` | 三階段 Agent 協作規範 |
 | Figma Wireframe | **v2 完成** | Figma file `ZoALSuVUPFWs0veldFXDbX`（8 頁） | 後台全頁面線框圖 |
-| 後台 Prototype (HTML) | **v2 完成** | `apps/backoffice/index.html` | 可互動 HTML Prototype（可部署） |
-| **前台 Prototype (HTML)** | **v2 完成** | `apps/player/index.html` | 淡紫糖果主題 + 5 頁完整互動（7 情境 Demo Controls） |
+| 後台 Prototype (HTML) | **v2 完成 + 已部署** | `apps/backoffice/index.html` | 🐛 Clement 回報有 bug 待修（待細節）|
+| **前台 Prototype (HTML)** | **v2 完成 + 已部署** | `apps/player/index.html` | 淡紫糖果主題 + 5 頁完整互動（6 情境 Demo Controls；含 Mobile Drawer）|
 | 術語表 | 完成 | `docs/memory/glossary.md` | 中英對照術語；已對齊 D52/D58 狀態翻譯 |
 | **Design Agent 工作備忘** | 完成 | `docs/memory/design-system.md` | Design token、金額格式、Clement 反饋（不進 PRD） |
 | **Design System Tokens** | **新 (2026-04-21)** | `design-system/tokens/*.json` | colors / typography / spacing / radius |
 | **Design System Components** | **新** | `design-system/components/*.md` | Button / Card / TurnoverStatus 規格 |
 | **Shared Tailwind Config** | **新** | `design-system/styles/tailwind.config.js` | 兩 app 共用 theme |
-| 決策紀錄 | 完成 | `docs/memory/context/decision-log.md` | D1~**D61** 所有架構決策 |
+| 決策紀錄 | 完成 | `docs/memory/context/decision-log.md` | D1~**D81** 所有架構決策（Session 1~7）|
+| **Session Handoff** | **新** | `SESSION-HANDOFF.md` | 新 session 必讀；5 大原則 + 優先續辦 + 踩坑警告 |
 
 ## 已確認架構決策（摘要）
 | # | 決策 | 備註 |
@@ -62,8 +73,27 @@ Clement (clementine.tseng@the-force.com.tw), PM at The Force. 負責 iGaming 平
 | 25 | **空狀態 / Help 入口統一** | 禁止空白區域（emoji + 一行 + CTA）；Footer 放 FAQ + Contact Support；每活動卡自帶 `View T&C` (D54/D55/D59) |
 | 26 | **Gift Box / Reward Center 採 Section 式分類（參考 Rainbet）** | V1：`Active Promotion` + `For You`；V2 預留位：`Claim Now` / `VIP` / `Rakeback` / `Total Rewards`；無資料 Section 整段隱藏 (D60) |
 | 27 | **Record 頁僅新增 Promotion Tab** | Transaction / Game 由現有平台提供；本 PRD 不重複寫規格 (D61) |
+| 28 | **設計主題 = 糖果紫**（PP 實機）| 淡紫漸層背景 + 白卡 + 藍紫漸層 CTA + 黃 `#FFC107` Balance；非藍非深色 (D62) |
+| 29 | **Deposit 沿用 PP 骨架** + 插入促銷模組 | Payment → Choose your bonus → Amount → Summary → Submit (D63) |
+| 30 | **選擇促銷用 Dropdown（radio list）** | 取代 card grid；Label 用 `Choose your bonus`（D65/D66） |
+| 31 | **所有 Reward 活動卡 CTA = `Claim Now`** | 取代 `Deposit to Join`；對齊 Rainbet (D67) |
+| 32 | **Withdraw 阻擋時整個 form 灰掉** + **移除 Available Balance ⓘ** | Blocker Card 負責完整解釋；下方 form `opacity-50 pointer-events-none` (D69/D70) |
+| 33 | **Learn more Modal = intro + Progress + FAQ accordion** | 減少客訴；PH 玩家自助查 (D71) |
+| 34 | **Gift Box 三狀態互斥** + 不顯示 Pending 詳情 | 可提款狀態 row 不顯示；Pending 改一行 `+ N more pending` (D72/D73) |
+| 35 | **OOB Welcome banner 移除** | 走正常流程；Demo KYC scenario 也刪除 (D74/D79) |
+| 36 | **Record 卡 Status 放前** + 左側彩色 border | Bonus 金額移右小字；Mobile Filter Popover 仿 PP 圖 (D75/D76) |
+| 37 | **術語嚴格對齊 PRD** | 禁 `wager/WR/bet target`；用 `Bet`/`Turnover`；`Bet ₱X more to withdraw` (D77) |
+| 38 | **UI 命名分層** | Player 看 `Rewards`/`Reward Center`；內部用 `Gift Box` (D78) |
+| 39 | **Mobile-first + Hamburger Drawer** | Header 壓縮；`grid-cols` 改 responsive (D80) |
+| 40 | **Monorepo 重組 + 雙 service 部署** | `apps/`+`design-system/`+`docs/`；Render 一 repo 部署兩 service (D81) |
+| 41 | **後台 Sidebar 縮減為 2 項** | 僅 `Promotion Management` + `Reward History`；移除未實作入口 (D82) |
+| 42 | **Status Toggle bug 修復** | `<label><input>` 原生 click 衝突解法：preventDefault + 強制 re-render (D83) |
+| 43 | **Wizard Create/Edit/View 三模式對齊 PRD** | View 隱藏 Save + `Done` 結束；Finish 文案改「saved as Disabled」(D84) |
+| 44 | **Step 3 Category Default 全 6 類必填 + 擋 Next** | Contribution Rate 空白擋 Next + 紅框 Toast (D85) |
+| 45 | **Deactivate Modal 文案逐字對齊 PRD** | impact #3 補「and can still be completed」；Remark「Min 2 chars」(D86) |
+| 46 | **Disabled → Enabled 必填欄位驗證**（PRD L77）| 不跳確認；缺項 → Toast + 跳第一個缺項 step Edit wizard；齊則直接切 (D87) |
 
-> **完整決策紀錄（D1~D61）見** `memory/context/decision-log.md`
+> **完整決策紀錄（D1~D87）見** `docs/memory/context/decision-log.md`
 
 ## 進度
 | Phase | 內容 | 狀態 | 備註 |
@@ -72,10 +102,11 @@ Clement (clementine.tseng@the-force.com.tw), PM at The Force. 負責 iGaming 平
 | 2-1 | 後台-活動設定管理 PRD | ✅ **定案** | Wizard 4 步驟 |
 | 2-2 | 後台-獎勵紀錄總表 PRD | ✅ **定案** | List + Drawer + Cancel Modal |
 | 3-1 | Figma Wireframe（後台） | ✅ **v2 完成** | 8 頁：Promotion 4 頁 + Reward History 2 頁 + Modals 1 頁 + List 1 頁 |
-| 3-2 | HTML Prototype（後台） | ✅ **v2 完成** | 全互動 Prototype，經兩輪 bug 修復 |
-| 3-3 | 前台 PRD（Design Agent） | ✅ **V1.0 定案** | `前台-玩家端 (Frontend) PRD.md` 五章完成；Gap Analysis D37~D59 整合 |
-| 3-4 | 前台 HTML Prototype | ⏳ **下一步** | `frontend-prototype/`，UAT 藍 `#5275E9` + Poppins；依序實作 Deposit → Withdraw → Gift Box → Reward Center → Record |
-| 4 | 交付 RD | ⏳ 待前台 Prototype 完成 | PRD + 後台/前台 Prototype 全部交給工程師照著實作 |
+| 3-2 | HTML Prototype（後台） | ✅ **v3 完成** | Session 8 完成 P0 bug 修復 + Enable 必填驗證；已 deploy |
+| 3-3 | 前台 PRD（Design Agent） | ✅ **V1.0 定案**（需反向同步 D62~D81）| `前台-玩家端 (Frontend) PRD.md` 五章完成；Session 7 Prototype 迭代決策待寫回 PRD |
+| 3-4 | 前台 HTML Prototype | ✅ **v2 完成 + 已部署** | 糖果紫主題 + 5 頁完整互動 |
+| **3-5** | **PRD 反向同步（D62~D87）** | ⏳ **下一步（新 session）** | 前台 PRD 補 D62~D81；後台 Promotion Management PRD 補 D82~D87 |
+| 4 | 交付 RD | ⏳ 待 PRD 反向同步完成 | PRD + 後台/前台 Prototype 全部交給工程師照著實作 |
 
 ## Prototype 完成狀態（v2）
 
