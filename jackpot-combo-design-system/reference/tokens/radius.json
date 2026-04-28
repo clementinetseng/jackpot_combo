@@ -1,0 +1,23 @@
+{
+  "description": "Border radius tokens",
+  "radius": {
+    "none":   { "value": "0px" },
+    "xs":     { "value": "4px" },
+    "sm":     { "value": "6px" },
+    "md":     { "value": "8px" },
+    "lg":     { "value": "10px", "description": "Button (10px — 對齊 UAT 現場)" },
+    "xl":     { "value": "14px", "description": "Card" },
+    "2xl":    { "value": "20px", "description": "Wallet Banner" },
+    "pill":   { "value": "9999px", "description": "Tab / Chip / Pill" }
+  },
+
+  "application": {
+    "button":        { "value": "pill", "description": "所有主要按鈕都是 pill 圓" },
+    "chipAmount":    { "value": "lg", "description": "Deposit Amount chips — 10px 方圓" },
+    "card":          { "value": "xl", "description": "主卡片 14px" },
+    "banner":        { "value": "2xl", "description": "Wallet Balance banner 20px" },
+    "input":         { "value": "pill", "description": "輸入框 pill shape" },
+    "modal":         { "value": "2xl", "description": "Modal 20px" },
+    "tab":           { "value": "pill" }
+  }
+}

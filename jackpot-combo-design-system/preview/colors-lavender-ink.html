@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Lavender + Ink</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:16px;background:#fff;font-family:var(--font-sans);color:var(--ink)}
+  .group{margin-bottom:12px}
+  .row{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .sw{border-radius:8px;padding:10px 8px;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border)}
+  .n{font-size:10px;font-weight:600;opacity:.95;letter-spacing:.02em}
+  .h{font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;opacity:.85}
+  .label{font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+</style></head>
+<body>
+  <div class="group"><div class="label">Lavender scale — player neutrals</div>
+  <div class="row">
+    <div class="sw" style="background:#F4EFFA"><span class="n">50</span><span class="h">#F4EFFA</span></div>
+    <div class="sw" style="background:#E8E0F5"><span class="n">100</span><span class="h">#E8E0F5</span></div>
+    <div class="sw" style="background:#D9CBE9"><span class="n">200</span><span class="h">#D9CBE9</span></div>
+    <div class="sw" style="background:#C8B8E5"><span class="n">300</span><span class="h">#C8B8E5</span></div>
+    <div class="sw" style="background:#A89ACC;color:#fff"><span class="n">400</span><span class="h">#A89ACC</span></div>
+    <div class="sw" style="background:#8E7DC0;color:#fff"><span class="n">500</span><span class="h">#8E7DC0</span></div>
+    <div class="sw" style="background:#6B5B8E;color:#fff"><span class="n">600</span><span class="h">#6B5B8E</span></div>
+    <div class="sw" style="background:#4A3B7A;color:#fff"><span class="n">700</span><span class="h">#4A3B7A</span></div>
+  </div></div>
+  <div class="group"><div class="label">Ink — text tiers</div>
+  <div class="row" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sw" style="background:#2D1B4E;color:#fff"><span class="n">ink · default</span><span class="h">#2D1B4E</span></div>
+    <div class="sw" style="background:#6B5B8E;color:#fff"><span class="n">ink · muted</span><span class="h">#6B5B8E</span></div>
+    <div class="sw" style="background:#8E7DC0;color:#fff"><span class="n">ink · soft</span><span class="h">#8E7DC0</span></div>
+  </div></div>
+</body></html>

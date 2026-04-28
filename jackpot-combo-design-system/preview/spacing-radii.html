@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Spacing + Radii</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:16px;background:#fff;font-family:var(--font-sans);color:var(--ink)}
+  .section{margin-bottom:14px}
+  .label{font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+  .sp-row{display:flex;align-items:flex-end;gap:10px}
+  .sp{background:var(--player-gradient-pill);border-radius:4px}
+  .sp-cap{font-size:10px;color:var(--ink-muted);margin-top:4px;text-align:center;font-variant-numeric:tabular-nums}
+  .r-row{display:flex;gap:10px;align-items:flex-end}
+  .r-tile{background:var(--lavender-100);border:1px solid var(--border);width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink-muted);font-weight:600}
+</style></head>
+<body>
+  <div class="section">
+    <div class="label">Spacing · 4px base</div>
+    <div class="sp-row">
+      <div><div class="sp" style="width:4px;height:24px"></div><div class="sp-cap">4</div></div>
+      <div><div class="sp" style="width:8px;height:24px"></div><div class="sp-cap">8</div></div>
+      <div><div class="sp" style="width:12px;height:24px"></div><div class="sp-cap">12</div></div>
+      <div><div class="sp" style="width:16px;height:24px"></div><div class="sp-cap">16</div></div>
+      <div><div class="sp" style="width:20px;height:24px"></div><div class="sp-cap">20</div></div>
+      <div><div class="sp" style="width:24px;height:24px"></div><div class="sp-cap">24</div></div>
+      <div><div class="sp" style="width:32px;height:24px"></div><div class="sp-cap">32</div></div>
+      <div><div class="sp" style="width:40px;height:24px"></div><div class="sp-cap">40</div></div>
+      <div><div class="sp" style="width:48px;height:24px"></div><div class="sp-cap">48</div></div>
+      <div><div class="sp" style="width:64px;height:24px"></div><div class="sp-cap">64</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="label">Radius</div>
+    <div class="r-row">
+      <div style="text-align:center"><div class="r-tile" style="border-radius:4px">xs</div><div class="sp-cap">4</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:6px">sm</div><div class="sp-cap">6</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:8px">md</div><div class="sp-cap">8</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:10px">lg</div><div class="sp-cap">10 · chip</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:14px">xl</div><div class="sp-cap">14 · card</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:20px">2xl</div><div class="sp-cap">20 · banner</div></div>
+      <div style="text-align:center"><div class="r-tile" style="border-radius:9999px;width:84px">pill</div><div class="sp-cap">pill · btn/input</div></div>
+    </div>
+  </div>
+</body></html>

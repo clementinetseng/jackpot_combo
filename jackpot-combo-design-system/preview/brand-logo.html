@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Logo</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:16px;background:linear-gradient(135deg,#F7F5FF 0%,#EFEAFF 100%);display:grid;grid-template-columns:130px 1fr 130px;gap:12px;min-height:100vh;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  .tile{border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(45,27,78,0.08);position:relative;min-height:150px}
+  .tile.light{background:#fff}
+  .tile.dark{background:#0E0B1F}
+  .tile.lavender{background:linear-gradient(135deg,#9E74FF 0%,#8067FF 100%)}
+  .label{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;position:absolute;top:10px;left:12px}
+  .light .label{color:#9A93AE}
+  .dark .label, .lavender .label{color:rgba(255,255,255,0.55)}
+  img{display:block;image-rendering:-webkit-optimize-contrast}
+</style></head>
+<body>
+  <div class="tile dark">
+    <span class="label">Mark</span>
+    <img src="../assets/logo-mark.png" alt="" style="width:72px;height:auto;border-radius:12px;box-shadow:0 6px 18px rgba(119,79,255,0.45)">
+  </div>
+  <div class="tile light">
+    <span class="label">Primary lockup</span>
+    <img src="../assets/logo-lockup-dark.png" alt="jackpot combo" style="width:86%;max-width:320px;height:auto">
+  </div>
+  <div class="tile lavender">
+    <span class="label">Mark — on purple</span>
+    <img src="../assets/logo-mark.png" alt="" style="width:72px;height:auto;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.22)">
+  </div>
+</body></html>

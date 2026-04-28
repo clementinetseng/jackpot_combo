@@ -1,0 +1,70 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "description": "Jackpot Combo color tokens. All hex values; for OKLCH conversion use design-tool-specific output.",
+
+  "brand": {
+    "player": {
+      "primary":      { "value": "#8E66FF", "description": "Player 前台主紫色（CTA / Active Tab）" },
+      "primaryLight": { "value": "#B185FF", "description": "紫漸層終點" },
+      "secondary":    { "value": "#6FB1FC", "description": "藍紫漸層起點（Banner）" },
+      "deep":         { "value": "#5B46A6", "description": "深紫 fallback" },
+      "gradientCta":  { "value": "linear-gradient(90deg, #6FB1FC 0%, #8E66FF 100%)", "description": "Primary CTA 漸層" },
+      "gradientPill": { "value": "linear-gradient(90deg, #8E66FF 0%, #B185FF 100%)", "description": "Pill / Active Tab 漸層" },
+      "gradientBanner":{ "value":"linear-gradient(90deg, #6FB1FC 0%, #8E66FF 60%, #B185FF 100%)", "description": "Wallet Banner 漸層" },
+      "gradientPage": { "value": "linear-gradient(140deg, #EBE3F7 0%, #D5C5EA 60%, #BFA8E1 100%)", "description": "整頁淡紫糖果背景" }
+    },
+    "backoffice": {
+      "primary":      { "value": "#2563EB", "description": "後台主藍色" },
+      "primaryHover": { "value": "#1D4ED8", "description": "Hover" },
+      "primaryLight": { "value": "#EFF3FF", "description": "Tint" },
+      "primaryText":  { "value": "#1E40AF", "description": "強調文字" }
+    }
+  },
+
+  "accent": {
+    "yellow":  { "value": "#FFC107", "description": "Balance 數字 / 重要提醒" }
+  },
+
+  "lavender": {
+    "50":  { "value": "#F4EFFA" },
+    "100": { "value": "#E8E0F5" },
+    "200": { "value": "#D9CBE9" },
+    "300": { "value": "#C8B8E5" },
+    "400": { "value": "#A89ACC", "description": "Sidebar 底" },
+    "500": { "value": "#8E7DC0" },
+    "600": { "value": "#6B5B8E" },
+    "700": { "value": "#4A3B7A" }
+  },
+
+  "ink": {
+    "default": { "value": "#2D1B4E", "description": "主文字（深紫近黑）" },
+    "muted":   { "value": "#6B5B8E", "description": "次文字" },
+    "soft":    { "value": "#8E7DC0", "description": "弱文字 / placeholder" }
+  },
+
+  "semantic": {
+    "success":      { "value": "#10B981" },
+    "successLight": { "value": "#D1FAE5" },
+    "warning":      { "value": "#F59E0B", "description": "Pending / Failed 中性橘" },
+    "warningLight": { "value": "#FEF3C7" },
+    "danger":       { "value": "#EF4444", "description": "錯誤 / 即時驗證紅字" },
+    "dangerLight":  { "value": "#FEE2E2" },
+    "info":         { "value": "#7C3AED" },
+    "infoLight":    { "value": "#F3EEFF" }
+  },
+
+  "neutral": {
+    "white":  { "value": "#FFFFFF" },
+    "black":  { "value": "#000000" },
+    "border": { "value": "#E5DCF5", "description": "Player theme 細邊框" },
+    "borderCool": { "value": "#DFE2E8", "description": "Backoffice theme 細邊框" }
+  },
+
+  "status": {
+    "active":       { "value": "#8E66FF", "description": "ACTIVE — 前台 badge" },
+    "pending":      { "value": "#6B5B8E", "description": "PENDING — grey" },
+    "completed":    { "value": "#10B981", "description": "COMPLETED 🎉" },
+    "outOfBalance": { "value": "#F59E0B", "description": "Ended (low balance)" },
+    "cancelled":    { "value": "#F97316", "description": "Cancelled" }
+  }
+}

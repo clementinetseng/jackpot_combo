@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Shadows</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:24px;background:var(--player-gradient-page);font-family:var(--font-sans);color:var(--ink)}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .tile{background:#fff;border-radius:14px;padding:18px;text-align:center}
+  .tile.card{box-shadow:var(--shadow-card)}
+  .tile.hover{box-shadow:var(--shadow-card-hover)}
+  .tile.pill{box-shadow:var(--shadow-pill);background:var(--player-gradient-pill);color:#fff}
+  .n{font-weight:700;font-size:13px;margin-bottom:4px}
+  .h{font-size:10px;color:var(--ink-muted);font-variant-numeric:tabular-nums}
+  .tile.pill .h{color:rgba(255,255,255,.8)}
+</style></head>
+<body>
+  <div class="row">
+    <div class="tile card"><div class="n">card</div><div class="h">0 4 20 -6 · 139,102,255 / .15</div></div>
+    <div class="tile hover"><div class="n">cardHover</div><div class="h">0 10 30 -8 · 139,102,255 / .25</div></div>
+    <div class="tile pill"><div class="n">pill</div><div class="h">0 2 8 -2 · 139,102,255 / .4</div></div>
+  </div>
+</body></html>

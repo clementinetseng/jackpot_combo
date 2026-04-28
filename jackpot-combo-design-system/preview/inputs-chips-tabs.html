@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Inputs · chips · tabs</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:16px;background:#fff;font-family:var(--font-sans);color:var(--ink)}
+  .label{font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin:8px 0 6px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .tab{padding:8px 20px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--lavender-50);color:var(--ink-muted)}
+  .tab.active{background:var(--player-gradient-pill);color:#fff;border-color:transparent;box-shadow:var(--shadow-pill)}
+  .chip{padding:14px 8px;border-radius:10px;border:2px solid var(--border);text-align:center;font-weight:600;color:var(--ink-muted);background:#fff;min-width:70px;font-family:inherit;font-size:13px;cursor:pointer}
+  .chip.active{background:var(--player-gradient-pill);color:#fff;border-color:transparent;font-weight:800;box-shadow:var(--shadow-pill)}
+  .input{width:100%;max-width:360px;padding:12px 18px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-size:14px;font-family:inherit;color:var(--ink);outline:none}
+  .input:focus{border-color:var(--player-primary);box-shadow:0 0 0 3px rgba(142,102,255,.18)}
+</style></head>
+<body>
+  <div class="label">Tab pills</div>
+  <div class="row"><button class="tab active">Promotions</button><button class="tab">Transactions</button><button class="tab">Game</button></div>
+  <div class="label">Amount chips (10px — the rectangular exception)</div>
+  <div class="row"><button class="chip">₱500</button><button class="chip active">₱1,000</button><button class="chip">₱3,000</button><button class="chip">₱5,000</button><button class="chip">₱10,000</button></div>
+  <div class="label">Input (pill)</div>
+  <div class="row"><input class="input" placeholder="Enter deposit amount"></div>
+</body></html>

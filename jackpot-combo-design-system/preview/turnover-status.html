@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Turnover Status</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:16px;background:var(--player-gradient-page);font-family:var(--font-sans);color:var(--ink)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .card{background:rgba(244,239,250,.9);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .card.ok{background:#D1FAE5;border-color:#10B981;display:flex;align-items:center;gap:12px}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .title{font-weight:700;font-size:13px}
+  .pct{font-size:11px;color:var(--ink-muted);font-variant-numeric:tabular-nums}
+  .bar{height:8px;background:#fff;border-radius:9999px;overflow:hidden;margin-bottom:8px}
+  .fill{height:100%;background:var(--player-gradient-pill);border-radius:9999px}
+  .sub{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-muted);font-variant-numeric:tabular-nums}
+  .sub strong{color:var(--ink);font-weight:700}
+  .icon{font-size:26px}
+</style></head>
+<body>
+  <div class="row">
+    <div class="card">
+      <div class="head"><div class="title">🎰 100% First Deposit Bonus</div><div class="pct">71%</div></div>
+      <div class="bar"><div class="fill" style="width:71%"></div></div>
+      <div class="sub"><span>Bet <strong>₱13,200</strong> more to withdraw</span><span>₱31,800 / ₱45,000</span></div>
+    </div>
+    <div class="card">
+      <div class="head"><div class="title">💰 Deposit Turnover</div><div class="pct">20%</div></div>
+      <div class="bar"><div class="fill" style="width:20%"></div></div>
+      <div class="sub"><span>Bet <strong>₱2,400</strong> more to withdraw</span><span>₱600 / ₱3,000</span></div>
+    </div>
+    <div class="card ok" style="grid-column:span 2">
+      <div class="icon">✅</div>
+      <div style="flex:1"><div style="font-size:11px;color:#065F46">Ready to withdraw</div><div style="font-size:18px;font-weight:700;color:#065F46">₱6,882.43</div></div>
+    </div>
+  </div>
+</body></html>

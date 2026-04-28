@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>In-App Messaging · Jackpot Combo</title>
+<meta name="viewport" content="width=1440" />
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  html, body { margin:0; padding:0; background:#1A1330; min-height:100vh; }
+  * { box-sizing: border-box; }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(243,109,243,0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(243,109,243,0); }
+    100% { box-shadow: 0 0 0 0 rgba(243,109,243,0); }
+  }
+  @keyframes toastIn {
+    from { opacity:0; transform: translateY(20px) translateX(20px) scale(0.96); }
+    to   { opacity:1; transform: translateY(0) translateX(0) scale(1); }
+  }
+  @keyframes toastBar {
+    from { width: 100%; } to { width: 0%; }
+  }
+  @keyframes toastDrop {
+    from { opacity:0; transform: translate(-50%, -10px); }
+    to   { opacity:1; transform: translate(-50%, 0); }
+  }
+  @keyframes wizardSlideIn {
+    from { opacity:0; transform: translateX(28px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  @keyframes wizardSlideInBack {
+    from { opacity:0; transform: translateX(-28px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes modalIn {
+    from { opacity:0; transform: scale(0.92); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  @keyframes blink {
+    0%, 60%, 100% { background:#16A34A; }
+    30% { background:#22C55E; }
+  }
+  .ws-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#16A34A; animation:blink 2s infinite; }
+
+  .stage-page {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(132,103,255,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(111,177,252,0.12) 0%, transparent 50%),
+      #0F0820;
+    min-height:100vh;
+    padding:32px 28px;
+    color:#fff;
+    font-family:'Poppins', sans-serif;
+  }
+
+  .top-bar {
+    display:flex; align-items:center; gap:14px; margin-bottom:24px;
+    max-width:1380px; margin-left:auto; margin-right:auto;
+  }
+  .stage-title {
+    font-size:22px; font-weight:800; letter-spacing:-0.01em;
+    background:linear-gradient(90deg, #FFD74A 0%, #B185FF 50%, #6FB1FC 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .stage-sub { font-size:12px; color:rgba(255,255,255,0.55); }
+
+  .product-tabs {
+    display:flex; gap:4px; background:rgba(255,255,255,0.06); padding:4px; border-radius:9999px;
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  .product-tab {
+    background:transparent; border:0; color:rgba(255,255,255,0.6);
+    padding:8px 18px; border-radius:9999px; cursor:pointer; font-weight:600;
+    font-size:13px; font-family:Poppins; letter-spacing:-0.005em;
+    transition:all 200ms;
+  }
+  .product-tab.active {
+    background:linear-gradient(90deg, #8E66FF 0%, #B185FF 100%);
+    color:#fff; box-shadow:0 4px 16px -4px rgba(139,102,255,0.6);
+  }
+
+  .stage-grid {
+    max-width:1380px; margin:0 auto;
+    display:grid; grid-template-columns: 460px 1fr; gap:28px;
+    align-items:start;
+  }
+  .stage-grid.office-mode { grid-template-columns: 1fr; }
+
+  .panel-label {
+    font-size:11px; font-weight:600; color:rgba(255,255,255,0.6);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .ws-panel {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px; padding:16px;
+    margin-top:14px;
+    backdrop-filter: blur(12px);
+  }
+  .ws-row {
+    display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px;
+    background:rgba(255,255,255,0.03); margin-bottom:6px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .ws-row:hover { background:rgba(255,255,255,0.06); }
+  .ws-event-id { font-family:ui-monospace, Menlo, monospace; font-size:10px; color:#B185FF; flex-shrink:0; min-width:140px; }
+  .ws-evt-label { font-size:11px; color:rgba(255,255,255,0.85); flex:1; }
+  .ws-push-btn {
+    background:linear-gradient(90deg, #6FB1FC 0%, #8E66FF 100%);
+    color:#fff; border:0; padding:5px 12px; border-radius:9999px;
+    font-size:11px; font-weight:600; cursor:pointer; font-family:Poppins;
+    box-shadow:0 2px 8px -2px rgba(139,102,255,0.5);
+  }
+  .ws-push-btn:hover { filter:brightness(1.1); }
+  .ws-push-btn.toast-tag::after { content:' 🔔'; }
+
+  .frame-card {
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px; padding:14px; backdrop-filter: blur(12px);
+  }
+  .right-stage {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; padding:0; overflow:hidden;
+    min-height:760px;
+  }
+</style>
+<script type="application/json" id="bundler-thumbnail-fallback"></script>
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8E66FF"/><stop offset="100%" stop-color="#6FB1FC"/></linearGradient></defs>
+    <rect width="200" height="200" fill="url(#g)" rx="40"/>
+    <g transform="translate(60,60)" fill="#fff">
+      <rect x="0" y="10" width="80" height="60" rx="10" opacity="0.95"/>
+      <path d="M 4 18 L 40 44 L 76 18" stroke="#8E66FF" stroke-width="3" fill="none"/>
+      <circle cx="70" cy="14" r="9" fill="#F36DF3"/>
+    </g>
+  </svg>
+</template>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="data.js"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="player-components.jsx"></script>
+<script type="text/babel" src="player-app.jsx"></script>
+<script type="text/babel" src="office-app.jsx"></script>
+<script type="text/babel" src="office-wizard.jsx"></script>
+<script type="text/babel" src="office-detail.jsx"></script>
+
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "maxToasts": 3,
+  "toastsEnabled": true,
+  "showWsPanel": true,
+  "compactCards": false
+}/*EDITMODE-END*/;
+
+function Stage() {
+  const [product, setProduct] = useState('player');
+  const [tweaks, setTweak] = window.useTweaks ? window.useTweaks(TWEAK_DEFAULTS) : [TWEAK_DEFAULTS, ()=>{}];
+  const pushRef = useRef(null);
+
+  const handlePushFromOutside = (fn) => { pushRef.current = fn; };
+
+  const eventList = [
+    ['deposit.success', 'Deposit success'],
+    ['deposit.failed', 'Deposit failed'],
+    ['withdrawal.submitted', 'Withdrawal submitted'],
+    ['withdrawal.completed', 'Withdrawal completed'],
+    ['withdrawal.rejected', 'Withdrawal rejected'],
+    ['kyc.approved', 'KYC approved'],
+    ['kyc.rejected', 'KYC rejected'],
+    ['password.changed', 'Password changed'],
+    ['user.first_login', 'First login welcome'],
+    ['vip.upgraded', 'VIP upgraded'],
+    ['deposit.turnover_met', 'Deposit turnover cleared'],
+    ['promotion.turnover_met', 'Promo bonus unlocked'],
+  ];
+
+  return (
+    <div className="stage-page">
+      <div className="top-bar">
+        <div>
+          <div className="stage-title">In-App Messaging · v0.1</div>
+          <div className="stage-sub">Hi-fi prototype · Jackpot Combo design system · {new Date().toLocaleDateString('en-PH', {month:'short', day:'numeric', year:'numeric'})}</div>
+        </div>
+        <div style={{flex:1}} />
+        <div className="product-tabs">
+          <button className={`product-tab ${product==='player'?'active':''}`} onClick={() => setProduct('player')}>📱 Player</button>
+          <button className={`product-tab ${product==='office'?'active':''}`} onClick={() => setProduct('office')}>🖥 Backoffice</button>
+        </div>
+      </div>
+
+      <div className={`stage-grid ${product === 'office' ? 'office-mode' : ''}`}>
+        {product === 'player' && (
+          <>
+            <div>
+              <div className="panel-label">📱 Player frontend</div>
+              <div style={{display:'flex', justifyContent:'center'}}>
+                <window.PlayerApp tweaks={tweaks} onPushFromOutside={handlePushFromOutside} />
+              </div>
+              {tweaks.showWsPanel && (
+                <div className="ws-panel">
+                  <div className="panel-label" style={{marginBottom:6}}>
+                    <span className="ws-dot"></span> WebSocket simulator · click to push events
+                  </div>
+                  <div style={{fontSize:10, color:'rgba(255,255,255,0.5)', marginBottom:10, lineHeight:1.5}}>
+                    Triggers a server → client push. 🔔 = toast (Personal only). System / Promo never toast per PRD §5.4.
+                  </div>
+                  <div style={{maxHeight:280, overflowY:'auto', paddingRight:4}}>
+                    {eventList.map(([id, label]) => {
+                      const tpl = window.JC_DATA.TEMPLATES.find(t => t.id === id);
+                      const willToast = tpl.toast && tpl.category === 'personal';
+                      return (
+                        <div key={id} className="ws-row">
+                          <code className="ws-event-id">{id}</code>
+                          <span className="ws-evt-label">{label}</span>
+                          <button className="ws-push-btn" onClick={() => pushRef.current && pushRef.current(id)}>
+                            Push{willToast ? ' 🔔' : ''}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <div className="panel-label">📋 Notes & system overview</div>
+              <PlayerNotes />
+            </div>
+          </>
+        )}
+
+        {product === 'office' && (
+          <div>
+            <div className="panel-label">🖥 Operator backoffice</div>
+            <window.OfficeApp tweaks={tweaks} />
+            <OfficeNotes />
+          </div>
+        )}
+      </div>
+
+      {window.TweaksPanel && (
+        <window.TweaksPanel title="Tweaks">
+          <window.TweakSection title="Toasts">
+            <window.TweakToggle label="Toasts enabled" value={tweaks.toastsEnabled} onChange={v => setTweak('toastsEnabled', v)} />
+            <window.TweakSlider label="Max visible toasts" value={tweaks.maxToasts} min={1} max={5} step={1} onChange={v => setTweak('maxToasts', v)} />
+          </window.TweakSection>
+          <window.TweakSection title="Stage">
+            <window.TweakToggle label="WebSocket simulator" value={tweaks.showWsPanel} onChange={v => setTweak('showWsPanel', v)} />
+          </window.TweakSection>
+        </window.TweaksPanel>
+      )}
+    </div>
+  );
+}
+
+function PlayerNotes() {
+  return (
+    <div style={{
+      background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)',
+      borderRadius:18, padding:'20px 22px', color:'rgba(255,255,255,0.85)',
+      fontSize:13, lineHeight:1.65, backdropFilter:'blur(12px)',
+    }}>
+      <h3 style={{margin:'0 0 8px', fontSize:16, color:'#fff', fontWeight:700, letterSpacing:'-0.005em'}}>Player surface · key behaviours</h3>
+      <ul style={{margin:'0 0 18px', paddingLeft:18, color:'rgba(255,255,255,0.75)'}}>
+        <li><strong style={{color:'#FFD74A'}}>Inbox icon + red dot</strong> — animates on new message arrival (200ms scale + 1.2s ring pulse).</li>
+        <li><strong style={{color:'#FFD74A'}}>3 category tabs</strong> — Personal (transaction + compliance), Promotions (marketing + care), System (announcements).</li>
+        <li><strong style={{color:'#FFD74A'}}>Toast rule</strong> — only Personal-category messages with <code style={codeInline()}>toast=true</code> trigger a slide-in. Promo and System never toast.</li>
+        <li><strong style={{color:'#FFD74A'}}>Stacking</strong> — max {3} simultaneous toasts; overflow collapses into a "You have N new messages" summary card.</li>
+        <li><strong style={{color:'#FFD74A'}}>Auto-mark-read</strong> — opening a message writes <code style={codeInline()}>read_at</code> and updates the dot count immediately.</li>
+        <li><strong style={{color:'#FFD74A'}}>Read vs unread</strong> — unread cards: white background, bold title, coloured left accent, pink dot. Read cards: translucent, lighter weight.</li>
+        <li><strong style={{color:'#FFD74A'}}>90-day window</strong> — older messages hidden from inbox but kept in audit DB.</li>
+      </ul>
+
+      <h3 style={{margin:'0 0 8px', fontSize:16, color:'#fff', fontWeight:700, letterSpacing:'-0.005em'}}>Try it</h3>
+      <ol style={{margin:'0 0 4px', paddingLeft:18, color:'rgba(255,255,255,0.75)'}}>
+        <li>Open the inbox from the header bell.</li>
+        <li>Use the WebSocket simulator below to push 1–5 events in quick succession — watch the dot pulse, toast stack, and overflow summary.</li>
+        <li>Tap any unread card → opens detail, marks read, decrements badge.</li>
+        <li>Tap a toast → opens that message directly.</li>
+      </ol>
+    </div>
+  );
+}
+
+function OfficeNotes() {
+  return (
+    <div style={{
+      marginTop:20,
+      background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)',
+      borderRadius:18, padding:'20px 22px', color:'rgba(255,255,255,0.85)',
+      fontSize:13, lineHeight:1.65, backdropFilter:'blur(12px)',
+    }}>
+      <h3 style={{margin:'0 0 8px', fontSize:16, color:'#fff', fontWeight:700, letterSpacing:'-0.005em'}}>Backoffice · key flows</h3>
+      <ul style={{margin:0, paddingLeft:18, color:'rgba(255,255,255,0.75)'}}>
+        <li><strong style={{color:'#6FB1FC'}}>List</strong> — KPI strip + filterable table with inline status toggle. Toggle on Active/Disabled rows triggers confirm modal.</li>
+        <li><strong style={{color:'#6FB1FC'}}>Wizard</strong> — Compose → Recipients → Schedule → Review. 250 ms slide animation between steps. Live preview rendered as the actual player card.</li>
+        <li><strong style={{color:'#6FB1FC'}}>Detail</strong> — send progress bar animates on load; audit log inline; player view side-by-side.</li>
+        <li><strong style={{color:'#6FB1FC'}}>Event Templates</strong> — read-only inspector for the 12 PRD-defined event templates with rendered preview.</li>
+        <li><strong style={{color:'#6FB1FC'}}>Disable / Enable</strong> — both require confirmation; re-enabling does not re-trigger toasts (per PRD §6.4).</li>
+      </ul>
+    </div>
+  );
+}
+
+function codeInline() {
+  return {fontFamily:'ui-monospace, Menlo, monospace', fontSize:11, padding:'1px 6px', background:'rgba(142,102,255,0.2)', borderRadius:4, color:'#B185FF'};
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Stage />);
+</script>
+</body>
+</html>

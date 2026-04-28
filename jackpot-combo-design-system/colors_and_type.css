@@ -1,0 +1,252 @@
+/* ============================================================
+   Jackpot Combo — Colors & Typography
+   Single source of truth for both themes.
+
+   There are TWO themes that share neutrals + semantics:
+     Player Theme (糖果紫)  — Poppins, lavender background, purple gradient CTAs.
+     Backoffice Theme      — Inter/Poppins, clean grey, flat blue primary.
+
+   Usage:
+     <html data-theme="player">   or   <html data-theme="office">
+   Omit the attribute and you get the player theme (default).
+
+   Tokens mirror /reference/tokens/*.json in the canonical repo.
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---------- BRAND — PLAYER (Frontend) ---------- */
+  --player-primary:        #8E66FF;  /* main purple CTA / active tab */
+  --player-primary-light:  #B185FF;  /* gradient endpoint */
+  --player-secondary:      #6FB1FC;  /* blue gradient start (banner) */
+  --player-deep:           #5B46A6;  /* deep fallback purple */
+
+  --player-gradient-cta:     linear-gradient(90deg, #6FB1FC 0%, #8E66FF 100%);
+  --player-gradient-pill:    linear-gradient(90deg, #8E66FF 0%, #B185FF 100%);
+  --player-gradient-banner:  linear-gradient(90deg, #6FB1FC 0%, #8E66FF 60%, #B185FF 100%);
+  --player-gradient-page:    linear-gradient(140deg, #EBE3F7 0%, #D5C5EA 60%, #BFA8E1 100%);
+
+  /* ---------- BRAND — BACKOFFICE ---------- */
+  --office-primary:        #2563EB;
+  --office-primary-hover:  #1D4ED8;
+  --office-primary-light:  #EFF3FF;
+  --office-primary-text:   #1E40AF;
+  --office-sidebar:        #1E2433;
+  --office-sidebar-hover:  #2D3548;
+  --office-sidebar-active: #3A4560;
+  --office-sidebar-text:   #A0A8B8;
+
+  /* ---------- ACCENT ---------- */
+  --accent-yellow: #FFC107;   /* balance numbers & "Deposit" header CTA */
+
+  /* ---------- LAVENDER SCALE (Player neutrals) ---------- */
+  --lavender-50:  #F4EFFA;
+  --lavender-100: #E8E0F5;
+  --lavender-200: #D9CBE9;
+  --lavender-300: #C8B8E5;
+  --lavender-400: #A89ACC;  /* sidebar base */
+  --lavender-500: #8E7DC0;
+  --lavender-600: #6B5B8E;
+  --lavender-700: #4A3B7A;
+
+  /* ---------- INK (text) ---------- */
+  --ink:        #2D1B4E;   /* primary text, near-black purple */
+  --ink-muted:  #6B5B8E;   /* secondary text */
+  --ink-soft:   #8E7DC0;   /* placeholder / weak */
+
+  /* ---------- SEMANTIC ---------- */
+  --success:       #10B981;
+  --success-light: #D1FAE5;
+  --warning:       #F59E0B;
+  --warning-light: #FEF3C7;
+  --danger:        #EF4444;
+  --danger-light:  #FEE2E2;
+  --info:          #7C3AED;
+  --info-light:    #F3EEFF;
+
+  /* ---------- STATUS (for progress / reward records) ---------- */
+  --status-active:         #8E66FF;
+  --status-pending:        #6B5B8E;
+  --status-completed:      #10B981;
+  --status-out-of-balance: #F59E0B;
+  --status-cancelled:      #F97316;
+
+  /* ---------- NEUTRAL ---------- */
+  --white:        #FFFFFF;
+  --black:        #000000;
+  --border:       #E5DCF5;   /* soft lavender border — player */
+  --border-cool:  #DFE2E8;   /* neutral grey — backoffice */
+
+  /* ---------- OFFICE NEUTRALS (light grey canvas) ---------- */
+  --office-bg:           #F5F6FA;
+  --office-surface:      #FFFFFF;
+  --office-row-alt:      #F9FAFB;
+  --office-row-hover:    #F0F4FF;
+  --office-text:         #1A1D26;
+  --office-text-muted:   #6B7280;
+  --office-text-disabled:#C0C4CC;
+
+  /* ---------- RADII ---------- */
+  --r-xs:   4px;
+  --r-sm:   6px;
+  --r-md:   8px;
+  --r-lg:   10px;   /* button corner on the UAT build */
+  --r-xl:   14px;   /* cards */
+  --r-2xl:  20px;   /* wallet banner / modals */
+  --r-pill: 9999px;
+
+  /* ---------- SPACING (4px base) ---------- */
+  --sp-0:   0;
+  --sp-0-5: 2px;
+  --sp-1:   4px;
+  --sp-1-5: 6px;
+  --sp-2:   8px;
+  --sp-3:   12px;
+  --sp-4:   16px;
+  --sp-5:   20px;
+  --sp-6:   24px;
+  --sp-8:   32px;
+  --sp-10:  40px;
+  --sp-12:  48px;
+  --sp-16:  64px;
+  --sp-20:  80px;
+
+  /* ---------- SHADOWS ---------- */
+  --shadow-card:       0 4px 20px -6px rgba(139,102,255,0.15);
+  --shadow-card-hover: 0 10px 30px -8px rgba(139,102,255,0.25);
+  --shadow-pill:       0 2px 8px -2px rgba(139,102,255,0.4);
+  --shadow-sm:         0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:         0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg:         0 4px 16px rgba(0,0,0,0.12);
+  --shadow-overlay:    0 8px 32px rgba(0,0,0,0.18);
+
+  /* ---------- TYPE ---------- */
+  --font-sans:    'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-office:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --fs-2xs:  10px;
+  --fs-xs:   11px;
+  --fs-sm:   12px;
+  --fs-base: 14px;
+  --fs-md:   16px;
+  --fs-lg:   18px;
+  --fs-xl:   20px;
+  --fs-2xl:  24px;
+  --fs-3xl:  30px;
+  --fs-4xl:  36px;
+
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-extrabold: 800;
+
+  --lh-tight:   1.15;
+  --lh-snug:    1.25;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.625;
+
+  /* ---------- SEMANTIC (default = PLAYER) ---------- */
+  --bg:            var(--lavender-100);
+  --bg-page:       var(--player-gradient-page);
+  --surface:       var(--white);
+  --surface-soft:  var(--lavender-50);
+  --fg:            var(--ink);
+  --fg-muted:      var(--ink-muted);
+  --fg-soft:       var(--ink-soft);
+  --primary:       var(--player-primary);
+  --primary-hover: var(--player-primary-light);
+  --gradient-cta:  var(--player-gradient-cta);
+  --gradient-pill: var(--player-gradient-pill);
+  --border-color:  var(--border);
+  --font-family:   var(--font-sans);
+}
+
+/* ---------- BACKOFFICE THEME ---------- */
+[data-theme="office"] {
+  --bg:            var(--office-bg);
+  --bg-page:       var(--office-bg);
+  --surface:       var(--office-surface);
+  --surface-soft:  var(--office-row-alt);
+  --fg:            var(--office-text);
+  --fg-muted:      var(--office-text-muted);
+  --fg-soft:       var(--office-text-disabled);
+  --primary:       var(--office-primary);
+  --primary-hover: var(--office-primary-hover);
+  --gradient-cta:  var(--office-primary);
+  --gradient-pill: var(--office-primary);
+  --border-color:  var(--border-cool);
+  --font-family:   var(--font-office);
+}
+
+/* ============================================================
+   SEMANTIC TYPOGRAPHY
+   h1 = page title, h2 = section, display = balance, etc.
+   ============================================================ */
+html { font-family: var(--font-family); color: var(--fg); }
+body { font-family: var(--font-family); color: var(--fg); background: var(--bg-page); }
+
+.display,
+h1.display {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-extrabold);
+  line-height: var(--lh-tight);
+  color: var(--accent-yellow);
+  letter-spacing: -0.01em;
+}
+
+h1, .h1 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+h2, .h2 {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+h3, .h3 {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  color: var(--fg);
+}
+
+p, .body {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--fg);
+}
+
+.cta {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+}
+
+.badge-text {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.caption {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-regular);
+  color: var(--fg-muted);
+  line-height: var(--lh-normal);
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-bold);
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Office · table + stepper</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+</head>
+<body data-theme="office" style="margin:0;padding:16px;background:#F5F6FA;font-family:var(--font-office);color:#1A1D26">
+<style>
+  .card{background:#fff;border:1px solid #DFE2E8;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{background:#F8F9FB;text-align:left;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.03em;font-weight:600;color:#6B7280;border-bottom:1px solid #DFE2E8}
+  tbody td{padding:8px 12px;border-bottom:1px solid #F0F1F3}
+  .badge{display:inline-block;padding:2px 10px;border-radius:9999px;font-size:10px;font-weight:600}
+  .bg-s{background:#E8FAF0;color:#16A34A}
+  .bg-m{background:#F3F4F6;color:#6B7280}
+  .link{color:#2563EB;font-weight:500;cursor:pointer}
+  .step{display:flex;align-items:center;gap:8px;padding:16px;background:#fff;border:1px solid #DFE2E8;border-radius:10px}
+  .c{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600}
+  .c.done{background:#16A34A}
+  .c.cur{background:#2563EB}
+  .c.nxt{background:#DFE2E8;color:#6B7280}
+  .ln{height:2px;flex:1;background:#DFE2E8}
+  .ln.done{background:#16A34A}
+  .lbl{font-size:12px;font-weight:500;color:#6B7280}
+  .lbl.cur{color:#2563EB;font-weight:600}
+</style>
+  <div class="step">
+    <div class="c done">✓</div><span class="lbl">Basic</span>
+    <div class="ln done"></div>
+    <div class="c done">✓</div><span class="lbl">Condition</span>
+    <div class="ln"></div>
+    <div class="c cur">3</div><span class="lbl cur">Reward</span>
+    <div class="ln"></div>
+    <div class="c nxt">4</div><span class="lbl">Info</span>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th><input type="checkbox"></th><th>Promotion ID</th><th>Name</th><th>Type</th><th>Status</th><th>Period</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox"></td><td class="link">PR-00412</td><td>100% First Deposit Bonus</td><td>Deposit Bonus</td><td><span class="badge bg-s">Enabled</span></td><td>Apr 10 ~ Apr 30</td></tr>
+        <tr><td><input type="checkbox"></td><td class="link">PR-00411</td><td>50% Reload Bonus</td><td>Deposit Bonus</td><td><span class="badge bg-s">Enabled</span></td><td>Apr 15 ~ May 15</td></tr>
+        <tr><td><input type="checkbox"></td><td class="link">PR-00410</td><td>₱200 Slots Cashback</td><td>Cashback</td><td><span class="badge bg-m">Disabled</span></td><td>Apr 12 ~ Apr 18</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body></html>

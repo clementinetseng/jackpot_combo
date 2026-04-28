@@ -1,0 +1,43 @@
+{
+  "fontFamily": {
+    "sans":   { "value": ["Poppins", "sans-serif"], "description": "所有前後台共用" }
+  },
+
+  "fontSize": {
+    "2xs": { "value": "10px" },
+    "xs":  { "value": "11px" },
+    "sm":  { "value": "12px" },
+    "base":{ "value": "14px" },
+    "md":  { "value": "16px" },
+    "lg":  { "value": "18px" },
+    "xl":  { "value": "20px" },
+    "2xl": { "value": "24px" },
+    "3xl": { "value": "30px" },
+    "4xl": { "value": "36px" }
+  },
+
+  "fontWeight": {
+    "regular":  { "value": 400 },
+    "medium":   { "value": 500 },
+    "semibold": { "value": 600 },
+    "bold":     { "value": 700 },
+    "extrabold":{ "value": 800 }
+  },
+
+  "lineHeight": {
+    "tight":   { "value": 1.15 },
+    "snug":    { "value": 1.25 },
+    "normal":  { "value": 1.5 },
+    "relaxed": { "value": 1.625 }
+  },
+
+  "application": {
+    "display":   { "description": "Balance 大數字", "fontSize": "3xl", "fontWeight": "extrabold", "color": "accent.yellow" },
+    "h1":        { "description": "Page title", "fontSize": "2xl", "fontWeight": "bold" },
+    "h2":        { "description": "Section title", "fontSize": "lg", "fontWeight": "bold" },
+    "body":      { "description": "Default body text", "fontSize": "base", "fontWeight": "regular" },
+    "cta":       { "description": "Primary button", "fontSize": "base", "fontWeight": "semibold" },
+    "badge":     { "description": "Status badge", "fontSize": "xs", "fontWeight": "semibold" },
+    "caption":   { "description": "Helper text / date / hint", "fontSize": "xs", "fontWeight": "regular", "color": "ink.muted" }
+  }
+}

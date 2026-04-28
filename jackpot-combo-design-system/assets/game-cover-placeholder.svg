@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="placeholder-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B185FF"></stop>
+      <stop offset="0.5" stop-color="#8E66FF"></stop>
+      <stop offset="1" stop-color="#5B46A6"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="16" fill="url(#placeholder-grad)"></rect>
+  <text x="100" y="108" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="800" font-size="24" fill="rgba(255,255,255,0.9)">🎰</text>
+  <text x="100" y="140" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="600" font-size="12" fill="rgba(255,255,255,0.7)" letter-spacing="1">GAME COVER</text>
+</svg>
